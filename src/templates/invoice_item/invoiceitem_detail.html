@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<strong>{{ customer.first_name }} {{ customer.last_name }}</strong><br>
+{{ customer.telephone }}<br>
+{{ customer.email }}<br>
+{{ object.created_date }}<br>
+<br>
+Invoice Description: {{ object.description|upper }}<br>
+
+<br>
+
+<div class="entries">
+  <h4><strong>Invoice Items</strong></h4>
+    <a href="{% url 'invoice_item_app:invoice_item_add' pk=invoice.pk %}" class="btn btn-sm btn-success">Edit<</a>
+  <div class="datagrid">
+    <table>
+      <thead>
+        <tr>
+          <th width="10%"><strong>Date</strong></th>
+          <th width="55%"><strong>Description</strong></th>
+          <th width="20%"><strong>Status</strong></th>
+          <th width="15%"><strong>Actions</strong></th>
+        </tr>
+      </thead>
+      {% for invoice in invoices %}
+      <tr style="{% cycle 'background: white' 'background: #F0F0F0' %}">
+          <td>{{ invoice.created_date }}</td>
+          <td>{{ invoice.description }}</a></td>
+          <td>placeholder</td>
+          <td>
+              <a href="" class="btn btn-sm btn-success">Edit</a>
+
+              <a href="" class="btn btn-sm btn-danger">Delete</a>
+          </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+<br>
+
+
+{% endblock content %}

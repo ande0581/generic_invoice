@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% include 'q_search_form.html' %}
+<br>
+
+<h4 class="entries">
+  <div class="datagrid">
+    <table>
+      <thead>
+        <tr>
+          <th><strong>Customer</strong></th>
+          <th><strong>Description</strong></th>
+          <th><strong>Created Date</strong></th>
+          <th><strong>Delete</strong></th>
+        </tr>
+      </thead>
+      {% for invoice in object_list %}
+          <tr style="{% cycle 'background: white' 'background: #F0F0F0' %}">
+              <td>{{ invoice.customer }}</td>
+              <td>{{ invoice.description }}</td>
+              <td>{{ invoice.created_date|date}}</td>
+              <td><a href="{% url 'invoice_app:invoice_delete' pk=invoice.pk %}" class="btn btn-sm btn-danger">Delete</a></td>
+          </tr>
+      {% endfor %}
+    </table>
+</div>
+
+
+<nav aria-label="...">
+  <ul class="pager">
+    {% if page_obj.has_previous %}
+      <li><a href="?page={{ page_obj.previous_page_number }}"><strong>Previous</strong></a></li>
+    {% endif %}
+
+    {% if page_obj.has_next %}
+      <li><a href="?page={{ page_obj.next_page_number }}"><strong>Next</strong></a></li>
+    {% endif %}
+  </ul>
+</nav>
+
+{% endblock content %}

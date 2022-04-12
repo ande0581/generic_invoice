@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% include 'q_search_form.html' %}
+
+
+<h4 class="entries">
+  <h4><strong>Customers </strong><a href="{% url 'customer_app:customer_create' %}" class="btn btn-sm btn-success" role="button">Add</a></h4>
+  <div class="datagrid">
+    <table>
+      <thead>
+        <tr>
+          <th><strong>Name</strong></th>
+          <th><strong>Email</strong></th>
+          <th><strong>Telephone</strong></th>
+          <th><strong>Created Date</strong></th>
+        </tr>
+      </thead>
+      {% for customer in object_list %}
+          <tr style="{% cycle 'background: white' 'background: #F0F0F0' %}">
+              <td><a href="{{ customer.get_absolute_url }}">{{ customer.first_name }} {{ customer.last_name }}</a></td>
+              <td>{{ customer.email }}</td>
+              <td>{{ customer.telephone }}</td>
+              <td>{{ customer.created_date|date}}</td>
+          </tr>
+      {% endfor %}
+    </table>
+</div>
+
+
+<nav aria-label="...">
+  <ul class="pager">
+    {% if page_obj.has_previous %}
+      <li><a href="?page={{ page_obj.previous_page_number }}"><strong>Previous</strong></a></li>
+    {% endif %}
+
+    {% if page_obj.has_next %}
+      <li><a href="?page={{ page_obj.next_page_number }}"><strong>Next</strong></a></li>
+    {% endif %}
+  </ul>
+</nav>
+
+{% endblock content %}

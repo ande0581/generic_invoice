@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<strong>Customer Details:</strong><br>
+
+{{ object.first_name }} {{ object.last_name }}<br>
+{{ object.street }}<br>
+{{ object.city }}, {{ object.state }} {{ object.zip }}<br>
+{{ object.telephone }}<br>
+{{ object.email }}<br><br><br>
+
+<a href="{% url 'customer_app:customer_update' pk=object.pk %}" class="btn btn-sm btn-info"
+   role="button">Edit Customer</a>
+<a href="{% url 'customer_app:customer_delete' pk=object.pk %}" class="btn btn-sm btn-danger"
+   role="button">Delete Customer</a>
+<a href="{% url 'invoice_app:invoice_create' customer=object.pk %}" class="btn btn-sm btn-success"
+   role="button">Add Invoice</a>
+
+
+<br>
+<br>
+
+
+<div class="entries">
+  <h4><strong>Invoices</strong></h4>
+  <div class="datagrid">
+    <table>
+      <thead>
+        <tr>
+          <th width="20%"><strong>Date</strong></th>
+          <th width="65%"><strong>Description</strong></th>
+          <th width="15%"><strong>Actions</strong></th>
+        </tr>
+      </thead>
+      {% for invoice in invoices %}
+      <tr style="{% cycle 'background: white' 'background: #F0F0F0' %}">
+          <td>{{ invoice.created_date }}</td>
+          <td>{{ invoice.description }}</a></td>
+          <td>
+              <a href="{% url 'invoice_app:invoice_detail' pk=invoice.pk %}" class="btn btn-sm btn-success">Edit</a>
+
+              <a href="{% url 'invoice_app:invoice_delete' pk=invoice.pk %}" class="btn btn-sm btn-danger">Delete</a>
+          </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+<br>
+
+
+{% endblock content %}

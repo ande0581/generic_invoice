@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<strong>{{ invoiced_party.first_name }} {{ invoiced_party.last_name }} - {{ object.description|upper }} </strong><br>
+Invoice Created: {{ object.created_date }}<br><br>
+<a href="{% url 'invoice_app:invoice_update' pk=invoice.pk %}" class="btn btn-sm btn-info">Edit Description</a>
+<a href="{% url 'customer_app:customer_detail' pk=invoiced_party.pk %}" class="btn btn-sm btn-default">Return to Customer</a>
+
+
+<br><br>
+
+<div class="entries">
+  <h4><strong>{{ invoicing_party.first_name }} Items</strong>
+    <a href="{% url 'invoice_item_app:invoice_item_create' invoice=invoice.pk is_invoicing_party='True' %}" class="btn btn-sm btn-success">Add</a>
+  </h4>
+  <div class="datagrid">
+    <table>
+      <thead>
+        <tr>
+          <th width="65%"><strong>Description</strong></th>
+          <th width="10%"><strong>Cost</strong></th>
+          <th width="25%"><strong>Actions</strong></th>
+        </tr>
+      </thead>
+      {% for item in items %}
+      {% if item.is_invoicing_party %}
+      <tr style="{% cycle 'background: white' 'background: #F0F0F0' %}">
+          <td>{{ item.description }}</td>
+          <td>{{ item.cost }}</a></td>
+          <td>
+              <a href="{% url 'invoice_item_app:invoice_item_update' pk=item.id %}" class="btn btn-sm btn-info">Edit</a>
+              <a href="{% url 'invoice_item_app:invoice_item_delete' pk=item.id %}" class="btn btn-sm btn-danger">Delete</a>
+          </td>
+      </tr>
+      {% endif %}
+      {% endfor %}
+    </table>
+  </div>
+</div>
+<br><br>
+
+<div class="entries">
+  <h4><strong>{{ invoiced_party.first_name }} Items </strong>
+    <a href="{% url 'invoice_item_app:invoice_item_create' invoice=invoice.pk is_invoicing_party='False' %}" class="btn btn-sm btn-success">Add</a>
+  </h4>
+  <div class="datagrid">
+    <table>
+      <thead>
+        <tr>
+          <th width="65%"><strong>Description</strong></th>
+          <th width="10%"><strong>Cost</strong></th>
+          <th width="25%"><strong>Actions</strong></th>
+        </tr>
+      </thead>
+      {% for item in items %}
+      {% if not item.is_invoicing_party %}
+      <tr style="{% cycle 'background: white' 'background: #F0F0F0' %}">
+          <td>{{ item.description }}</td>
+          <td>{{ item.cost }}</a></td>
+          <td>
+              <a href="{% url 'invoice_item_app:invoice_item_update' pk=item.id %}" class="btn btn-sm btn-info">Edit</a>
+              <a href="{% url 'invoice_item_app:invoice_item_delete' pk=item.id %}" class="btn btn-sm btn-danger">Delete</a>
+          </td>
+      </tr>
+      {% endif %}
+      {% endfor %}
+    </table>
+  </div>
+</div>
+
+
+<br>
+
+
+{% endblock content %}
