@@ -78,6 +78,31 @@ Invoice Created: {{ object.created_date }}<br><br>
   </div>
 </div>
 
+<br><br>
+<div class="entries">
+  <h4><strong>Saved Invoices</strong></h4>
+  <div class="datagrid">
+    <table>
+      <thead>
+        <tr>
+          <th width="60%"><strong>Description</strong></th>
+          <th style="text-align:center" width="10%"><strong>Delete</strong></th>
+          <th style="text-align:right" width="10%"><strong>Email</strong></th>
+        </tr>
+      </thead>
+      {% for pdf in saved_invoices %}
+      <tr style="{% cycle 'background: white' 'background: #F0F0F0' %}">
+          <td><a href="../media/{{ pdf.filename }}" target="_blank">{{ pdf.shorten_filename }}</a></td>
+          <td style="text-align:center"><a href="{% url 'pdf_app:pdf_delete' pk=pdf.id %}">Delete</a></td>
+          <td style="text-align:right">Email</a></td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+<br><br>
+blah1 {{ MEDIA_URL }}!
+blah2 {{ pdf.filename }}!
 
 <br>
 

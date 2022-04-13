@@ -76,5 +76,5 @@ class PDFImageDelete(LoginRequiredMixin, DeleteView):
 
     def get_success_url(self):
         messages.success(self.request, "Successfully Deleted")
-        return reverse('pdf_app:pdf_list', kwargs={'pk': self.invoice_pk})
+        return reverse('invoice_app:invoice_detail', kwargs={'pk': self.invoice_pk})
 

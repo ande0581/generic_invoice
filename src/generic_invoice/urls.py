@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('account/', include('account.urls')),
@@ -24,4 +26,4 @@ urlpatterns = [
     path(r'invoice/', include('invoice.urls')),
     path(r'invoice_item/', include('invoice_item.urls')),
     path(r'pdf/', include('pdf.urls')),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

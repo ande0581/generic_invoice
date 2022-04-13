@@ -16,6 +16,7 @@ from .models import Invoice
 from django.apps import apps
 Customer = apps.get_model('customer', 'Customer')
 InvoiceItem = apps.get_model('invoice_item', 'InvoiceItem')
+PDFImage = apps.get_model('pdf', 'PDFImage')
 
 
 # Create your views here.
@@ -61,8 +62,10 @@ class InvoiceDetail(LoginRequiredMixin, DetailView):
         context['invoicing_party'] = Customer.objects.get(id=invoice_obj.invoicing_party.id)
         context['invoicing_items'] = invoicing_items_obj
         context['invoiced_items'] = invoiced_items_obj
+        context['saved_invoices'] = PDFImage.objects.filter(invoice=invoice_obj)
         context['invoicing_items_total'] = invoicing_items_obj.aggregate(Sum('cost'))['cost__sum']
         context['invoiced_items_total'] = invoiced_items_obj.aggregate(Sum('cost'))['cost__sum']
+
         # context['invoicing_party_total'] = invoice_obj
         # context['generic_invoice_pk'] = self.kwargs['pk']
         # # context['emails'] = EmailLog.objects.filter(customer_id=self.kwargs['pk'])

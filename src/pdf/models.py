@@ -20,7 +20,7 @@ class PDFImage(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
 
     def get_absolute_url(self):
-        return reverse('pdf_app:pdf_list', kwargs={'pk': self.invoice_id})
+        return reverse('invoice_app:invoice_detail', kwargs={'pk': self.invoice_id})
 
     def __str__(self):
         return str(self.filename)
