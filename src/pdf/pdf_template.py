@@ -92,29 +92,30 @@ def generate_pdf(request, obj, bid_item_dict, invoice, employee, save_to_disk=Fa
     styles.add(ParagraphStyle(name='Line_Label', fontSize=10, leading=12, alignment=TA_LEFT))
     styles.add(ParagraphStyle(name='Line_Label_Center', fontSize=7, alignment=TA_CENTER))
 
-    # Add Company Address, Logo and Invoice Info
-    company_paragraph = """
-        179 Marvy ST<br />
-        Lino Lakes, MN 55014<br />
-        (612) 508-2484 <br />
-        concrete@madsenservices.com <br />
-        MN License: BC690748
-        """
+    # Add Invoicing Party, Invoice ID and Date
+    telephone = obj.invoicing_party.telephone
+    telephone = "({}) {}-{}".format(telephone[:3], telephone[3:6], telephone[6:])
 
-    logo = os.path.join(settings.STATIC_ROOT, 'img/logo.jpg')
-    denominator = 5
-    image = Image(logo, width=800 / denominator, height=269 / denominator)
+    invoicing_party_paragraph = """
+        {first} {last}<br />
+        {street}<br />
+        {city}, {state} {zip}<br />
+        {telephone}<br />
+        {email}""".format(first=obj.invoicing_party.first_name, last=obj.invoicing_party.last_name,
+                          street=obj.invoicing_party.street, city=obj.invoicing_party.city,
+                          state=obj.invoicing_party.state, zip=obj.invoicing_party.zip,
+                          telephone=telephone, email=obj.invoicing_party.email)
 
-    proposal_invoice_paragraph = """
-        Submitted By: <br />
-        Tom Madsen <br />
-        Date: {}<br />
-        Proposal #: {:04d} <br />
-    """.format(datetime.date.today().strftime('%x'), obj.id)
+    header = ""
 
-    data1 = [[Paragraph(company_paragraph, styles['Line_Data_Large']),
-              image,
-              Paragraph(proposal_invoice_paragraph, styles['Line_Data_Large'])]]
+    invoice_number = """
+        Invoice: {id:04d}<br />
+        Date: {date}
+        """.format(id=obj.id, date=datetime.date.today().strftime('%x'))
+
+    data1 = [[Paragraph(invoicing_party_paragraph, styles['Line_Data_Large']),
+             Paragraph(header, styles['Line_Data_Large']),
+             Paragraph(invoice_number, styles['Line_Data_Large'])]]
 
     t1 = Table(data1, colWidths=(6.7 * cm, 8 * cm, 4.6 * cm))
     t1.setStyle(TableStyle([
@@ -123,17 +124,9 @@ def generate_pdf(request, obj, bid_item_dict, invoice, employee, save_to_disk=Fa
 
     story.append(t1)
 
-    # # Add Proposal or Invoice Title to PDF
-    # if invoice:
-    #     pdf_type = 'Invoice'
-    # elif employee:
-    #     pdf_type = 'Employee Copy'
-    # else:
-    #     pdf_type = 'Proposal'
-
-    pdf_type = 'Proposal'
-
-    data1 = [[Paragraph(pdf_type, styles["Line_Data_Largest"])]]
+    # Add Title to PDF
+    title = 'Invoice Title'
+    data1 = [[Paragraph(title, styles["Line_Data_Largest"])]]
 
     t1 = Table(data1, colWidths=(18.6 * cm))
     t1.setStyle(TableStyle([
@@ -143,55 +136,24 @@ def generate_pdf(request, obj, bid_item_dict, invoice, employee, save_to_disk=Fa
     story.append(t1)
     story.append(Spacer(2, 32))
 
-    # Add Customer Info and Job Description
-    telephone = '612-555-1000'
+    # Add Invoiced Party to Invoice
+    telephone = obj.invoiced_party.telephone
+    telephone = "({}) {}-{}".format(telephone[:3], telephone[3:6], telephone[6:])
 
-    # if obj.customer.company_name:
-    #     company = "{}<br />".format("Acme Company")
-    # else:
-    #     company = ""
-    company = ""
-
-    # location_paragraph = """
-    #     {first} {last}<br />
-    #     {company}
-    #     {street}<br />
-    #     {city}, {state} {zip}<br />
-    #     {telephone}<br />
-    #     {email}""".format(first=obj.customer.first_name, last=obj.customer.last_name, company=company,
-    #                       street=obj.address.street, city=obj.address.city, state=obj.address.state,
-    #                       zip=obj.address.zip, telephone=telephone, email=obj.customer.email)
-
-    location_paragraph = """This is my location paragraph"""
-
-    # if obj.billto_city_st_zip:  # check if this is an alternate billto field populated
-    #     if len(obj.billto_telephone) == 10:
-    #         billto_telephone = obj.billto_telephone
-    #         billto_telephone = "({}) {}-{}".format(billto_telephone[:3], billto_telephone[3:6], billto_telephone[6:])
-    #     else:
-    #         billto_telephone = obj.billto_telephone
-    #
-    #     billto_paragraph = """
-    #     {name}<br />
-    #     {street}<br />
-    #     {city_st_zip}<br />
-    #     {telephone}""".format(name=obj.billto_name,
-    #                           street=obj.billto_street,
-    #                           city_st_zip=obj.billto_city_st_zip,
-    #                           telephone=billto_telephone)
-    # else:
-    #     billto_paragraph = location_paragraph
-    #
-    # description_paragraph = obj.description
-    billto_paragraph = """This is my billto paragraph"""
-    description_paragraph = """This is my description paragraph"""
+    invoiced_party_paragraph = """
+        {first} {last}<br />
+        {street}<br />
+        {city}, {state} {zip}<br />
+        {telephone}<br />
+        {email}""".format(first=obj.invoiced_party.first_name, last=obj.invoiced_party.last_name,
+                          street=obj.invoiced_party.street, city=obj.invoiced_party.city,
+                          state=obj.invoiced_party.state, zip=obj.invoiced_party.zip, telephone=telephone,
+                          email=obj.invoiced_party.email)
 
     data1 = [[Paragraph('Bill To', styles["Line_Data_Large"]),
-              Paragraph('Job Address', styles["Line_Data_Large"])],
-
-             [Paragraph(billto_paragraph, styles["Line_Data_Large"]),
-              Paragraph(location_paragraph, styles["Line_Data_Large"])]
-             ]
+              Paragraph('Description', styles["Line_Data_Large"])],
+             [Paragraph(invoiced_party_paragraph, styles["Line_Data_Large"]),
+             Paragraph(obj.description, styles["Line_Data_Large"])]]
 
     t1 = Table(data1, colWidths=(9.3 * cm, 9.3 * cm))
     t1.setStyle(TableStyle([
@@ -202,19 +164,21 @@ def generate_pdf(request, obj, bid_item_dict, invoice, employee, save_to_disk=Fa
     story.append(t1)
     story.append(Spacer(4, 20))
 
-    data1 = [[Paragraph('Job Description', styles["Line_Data_Large"])],
-             [Paragraph(description_paragraph, styles["Line_Data_Large"])]]
-
-    t1 = Table(data1, colWidths=(18.6 * cm))
-    t1.setStyle(TableStyle([
-        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('BACKGROUND', (0, 0), (1, 0), colors.lightgrey)
-    ]))
-
-    story.append(t1)
+    # # Add Invoice Description
+    # description_paragraph = obj.description
+    # data1 = [[Paragraph('Job Description', styles["Line_Data_Large"])],
+    #          [Paragraph(description_paragraph, styles["Line_Data_Large"])]]
+    #
+    # t1 = Table(data1, colWidths=(18.6 * cm))
+    # t1.setStyle(TableStyle([
+    #     ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+    #     ('BACKGROUND', (0, 0), (1, 0), colors.lightgrey)
+    # ]))
+    #
+    # story.append(t1)
 
     # Add Bid Items to PDF
-    story.append(Spacer(4, 32))
+    # story.append(Spacer(4, 32))
 
     # for job_name, items in bid_item_dict.items():
     #     title = [[Paragraph(job_name, styles["Line_Data_Large"]),
@@ -413,9 +377,9 @@ def generate_pdf(request, obj, bid_item_dict, invoice, employee, save_to_disk=Fa
 
     t1 = Table(data1)
     story.append(t1)
-    print('length of story', len(story))
 
-    doc.build(story[:7], canvasmaker=NumberedCanvas)
+    # TODO figure out why index out of range error
+    doc.build(story[:5], canvasmaker=NumberedCanvas)
 
     pdf = buff.getvalue()
     buff.close()
