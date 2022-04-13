@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'customer',
     'invoice',
     'invoice_item',
+    'pdf',
 
     # 3rd party apps
     'crispy_forms',

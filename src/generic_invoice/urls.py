@@ -23,4 +23,5 @@ urlpatterns = [
     path('', include('invoice.urls')),
     path(r'invoice/', include('invoice.urls')),
     path(r'invoice_item/', include('invoice_item.urls')),
+    path(r'pdf/', include('pdf.urls')),
 ]

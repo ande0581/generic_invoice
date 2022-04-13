@@ -91,4 +91,4 @@ env/
 db.sqlite3
 media/
 notes
-
+/static

@@ -2,7 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse
-from django.db.models import Q
+from django.db.models import Sum, Q
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
@@ -55,9 +55,15 @@ class InvoiceDetail(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(InvoiceDetail, self).get_context_data(**kwargs)
         invoice_obj = Invoice.objects.get(pk=self.kwargs['pk'])
+        invoicing_items_obj = InvoiceItem.objects.filter(is_invoicing_party=True, invoice=invoice_obj)
+        invoiced_items_obj = InvoiceItem.objects.filter(is_invoicing_party=False, invoice=invoice_obj)
         context['invoiced_party'] = Customer.objects.get(id=invoice_obj.invoiced_party.id)
         context['invoicing_party'] = Customer.objects.get(id=invoice_obj.invoicing_party.id)
-        context['items'] = InvoiceItem.objects.filter(invoice_id=self.kwargs['pk'])
+        context['invoicing_items'] = invoicing_items_obj
+        context['invoiced_items'] = invoiced_items_obj
+        context['invoicing_items_total'] = invoicing_items_obj.aggregate(Sum('cost'))['cost__sum']
+        context['invoiced_items_total'] = invoiced_items_obj.aggregate(Sum('cost'))['cost__sum']
+        # context['invoicing_party_total'] = invoice_obj
         # context['generic_invoice_pk'] = self.kwargs['pk']
         # # context['emails'] = EmailLog.objects.filter(customer_id=self.kwargs['pk'])
         return context
