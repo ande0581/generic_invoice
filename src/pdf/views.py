@@ -41,19 +41,18 @@ def view_pdf(request, return_file_object=False, **kwargs):
     invoice_item_dict = None
     # response = generate_pdf(request, obj=obj, bid_item_dict=bid_item_dict, invoice=invoice, employee=employee,
     #                         save_to_disk=False, return_file_object=return_file_object)
-    response = generate_pdf(request, obj=obj, bid_item_dict=invoice_item_dict, invoice=False, employee=False,
-                            save_to_disk=False, return_file_object=None)
+    response = generate_pdf(request, obj=obj, invoice_item_dict=invoice_item_dict, save_to_disk=False)
     return response
 
 
 @login_required()
 def save_pdf(request, **kwargs):
-
-    # obj = Bid.objects.get(pk=kwargs['bid_id'])
+    obj = Invoice.objects.get(pk=kwargs['invoice_id'])
+    invoice_item_dict = None
     # bid_item_dict = create_bid_item_dict(obj)
     # response = generate_pdf(request, obj=obj, bid_item_dict=bid_item_dict, invoice=invoice, employee=employee,
     #                         save_to_disk=True)
-    response = generate_pdf()
+    response = generate_pdf(request, obj=obj, invoice_item_dict=invoice_item_dict, save_to_disk=True)
     return response
 
 

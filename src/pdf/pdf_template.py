@@ -49,7 +49,7 @@ class NumberedCanvas(canvas.Canvas):
                              "Page {} of {}".format(self._pageNumber, page_count))
 
 
-def generate_pdf(request, obj, bid_item_dict, invoice, employee, save_to_disk=False, return_file_object=False):
+def generate_pdf(request, obj, invoice_item_dict, save_to_disk=False):
     buff = BytesIO()
 
     # The page width totals 18.6cm
@@ -384,25 +384,17 @@ def generate_pdf(request, obj, bid_item_dict, invoice, employee, save_to_disk=Fa
     pdf = buff.getvalue()
     buff.close()
 
-    # if return_file_object:
-    #     # For send pdf to employee which isnt stored to database, return the file object
-    #     return pdf
+    if save_to_disk:
+        myfile = ContentFile(pdf)
+        db_model = PDFImage()
+        db_model.invoice = obj
+        filename_temp = 'invoice'
 
-    # if save_to_disk:
-    #     myfile = ContentFile(pdf)
-    #     db_model = PDFImage()
-    #     db_model.bid = obj
-    #     if invoice:
-    #         filename_temp = 'invoice'
-    #     else:
-    #         filename_temp = 'proposal'
-    #
-    #     db_model.filename.save(filename_temp, myfile)
-    #     messages.success(request, "PDF was saved successfully!")
-    #     return redirect('bid_app:bid_detail', pk=obj.id)
+        db_model.filename.save(filename_temp, myfile)
+        messages.success(request, "PDF was saved successfully!")
+        return redirect('invoice_app:invoice_detail', pk=obj.id)
 
-
-    filename = "{}_proposal_{}".format(obj.invoiced_party.__str__().replace(' ', '_').replace(',', '').lower(), datetime.date.today())
+    filename = "{}_invoice_{}".format(obj.invoiced_party.__str__().replace(' ', '_').replace(',', '').lower(), datetime.date.today())
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'filename={}.pdf'.format(filename)
     response.write(pdf)

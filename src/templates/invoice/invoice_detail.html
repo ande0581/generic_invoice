@@ -84,7 +84,7 @@ Invoice Created: {{ object.created_date }}<br><br>
     <a href="{% url 'pdf_app:pdf_view_invoice' invoice_id=invoice.pk %}" target="_blank" class="btn btn-sm btn-info"
        role="button">View Invoice</a>
 
-    <a href="{% url 'pdf_app:pdf_save_invoice' invoice_id=invoice.pk %}" target="_blank" class="btn btn-sm btn-info"
+    <a href="{% url 'pdf_app:pdf_save_invoice' invoice_id=invoice.pk %}" class="btn btn-sm btn-info"
        role="button">Save Invoice</a>
 
 {% endblock content %}
