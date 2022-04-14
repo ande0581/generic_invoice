@@ -24,6 +24,8 @@ urlpatterns = [
     path('customer/', include('customer.urls')),
     path('', include('invoice.urls')),
     path(r'invoice/', include('invoice.urls')),
+    path(r'invoice/', include('invoice_attachment.urls')),
     path(r'invoice_item/', include('invoice_item.urls')),
     path(r'pdf/', include('pdf.urls')),
+    path(r'send_email/', include('send_email.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

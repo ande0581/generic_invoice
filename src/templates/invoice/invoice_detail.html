@@ -5,20 +5,23 @@
 <strong>{{ invoiced_party.first_name }} {{ invoiced_party.last_name }} - {{ object.description|upper }} </strong><br>
 Invoice Created: {{ object.created_date }}<br><br>
 <a href="{% url 'invoice_app:invoice_update' pk=invoice.pk %}" class="btn btn-sm btn-info">Edit Description</a>
+<a href="{% url 'pdf_app:pdf_view_invoice' invoice_id=invoice.pk %}" target="_blank" class="btn btn-sm btn-primary"
+role="button">Preview Invoice</a>
+
+<a href="{% url 'pdf_app:pdf_save_invoice' invoice_id=invoice.pk %}" class="btn btn-sm btn-success"
+   role="button">Save Invoice</a>
+
 <a href="{% url 'customer_app:customer_detail' pk=invoiced_party.pk %}" class="btn btn-sm btn-default">Return to Customer</a>
 
 
 <br><br>
 
 <div class="entries">
-  <h4><strong>{{ invoicing_party.first_name }} Items</strong>
-    <a href="{% url 'invoice_item_app:invoice_item_create' invoice=invoice.pk is_invoicing_party='True' %}" class="btn btn-sm btn-success">Add</a>
-  </h4>
   <div class="datagrid">
     <table>
       <thead>
         <tr>
-          <th width="60%"><strong>Description</strong></th>
+          <th width="60%"><strong>{{ invoicing_party.first_name }} Items <a style="color:#5cb85c" href="{% url 'invoice_item_app:invoice_item_create' invoice=invoice.pk is_invoicing_party='True' %}">(Add)</a></strong></th>
           <th style="text-align:center" width="10%"><strong>Edit</strong></th>
           <th style="text-align:center" width="10%"><strong>Delete</strong></th>
           <th style="text-align:right" width="10%"><strong>Cost</strong></th>
@@ -35,24 +38,26 @@ Invoice Created: {{ object.created_date }}<br><br>
 
       <thead>
       <tr>
-          <th colspan="3" width="75px" style="background:gray"><strong>Total Paid By {{ invoicing_party.first_name }}</strong></th>
-          <th style="text-align:right; background:gray"><strong>${{ invoicing_items_total|floatformat:2 }}</strong></th>
+          <th colspan="3" width="75px"><strong>Total Paid By {{ invoicing_party.first_name }}</strong></th>
+          <th style="text-align:right"><strong>${{ invoicing_items_total|floatformat:2 }}</strong></th>
+      </tr>
+
+      <tr>
+          <th colspan="3" width="75px" style="background:gray"><strong>Half Owed By {{ invoiced_party.first_name }}</strong></th>
+          <th style="text-align:right; background:gray"><strong>${{ invoicing_items_total_half|floatformat:2 }}</strong></th>
       </tr>
       </thead>
     </table>
   </div>
 </div>
-<br><br>
+<br>
 
 <div class="entries">
-  <h4><strong>{{ invoiced_party.first_name }} Items </strong>
-    <a href="{% url 'invoice_item_app:invoice_item_create' invoice=invoice.pk is_invoicing_party='False' %}" class="btn btn-sm btn-success">Add</a>
-  </h4>
   <div class="datagrid">
     <table>
       <thead>
         <tr>
-          <th width="60%"><strong>Description</strong></th>
+          <th width="60%"><strong>{{ invoiced_party.first_name }} Items <a style="color:#5cb85c" href="{% url 'invoice_item_app:invoice_item_create' invoice=invoice.pk is_invoicing_party='False' %}">(Add)</a></strong></th>
           <th style="text-align:center" width="10%"><strong>Edit</strong></th>
           <th style="text-align:center" width="10%"><strong>Delete</strong></th>
           <th style="text-align:right"width="10%"><strong>Cost</strong></th>
@@ -69,14 +74,40 @@ Invoice Created: {{ object.created_date }}<br><br>
 
       <thead>
       <tr>
-          <th colspan="3" width="75px" style="background:gray"><strong>Total Paid By {{ invoiced_party.first_name }}</strong></th>
-          <th style="text-align:right; background:gray"><strong>${{ invoiced_items_total|floatformat:2 }}</strong></th>
+          <th colspan="3" width="75px"><strong>Total Paid By {{ invoiced_party.first_name }}</strong></th>
+          <th style="text-align:right;"><strong>${{ invoiced_items_total|floatformat:2 }}</strong></th>
+      </tr>
+
+      <tr>
+          <th colspan="3" width="75px" style="background:gray"><strong>Half Owed By {{ invoicing_party.first_name }}</strong></th>
+          <th style="text-align:right; background:gray"><strong>${{ invoiced_items_total_half|floatformat:2 }}</strong></th>
       </tr>
       </thead>
 
     </table>
   </div>
 </div>
+
+<br>
+<div class="entries">
+  <div class="datagrid">
+    <table>
+      <thead>
+        <tr>
+          <th width="80%"><strong>Summary</strong></th>
+          <th width="20%" style="text-align:right"><strong>Total</strong></th>
+        </tr>
+      </thead>
+        <tr>
+            <th>{{ the_owing_party }}</th>
+            <th style="text-align:right">${{ the_owing_total|floatformat:2 }}</th>
+        </tr>
+        </thead>
+
+    </table>
+  </div>
+</div>
+
 
 <br><br>
 <div class="entries">
@@ -87,29 +118,82 @@ Invoice Created: {{ object.created_date }}<br><br>
         <tr>
           <th width="60%"><strong>Description</strong></th>
           <th style="text-align:center" width="10%"><strong>Delete</strong></th>
-          <th style="text-align:right" width="10%"><strong>Email</strong></th>
+          <th style="text-align:center" width="10%"><strong>Email</strong></th>
         </tr>
       </thead>
       {% for pdf in saved_invoices %}
       <tr style="{% cycle 'background: white' 'background: #F0F0F0' %}">
           <td><a href="../media/{{ pdf.filename }}" target="_blank">{{ pdf.shorten_filename }}</a></td>
           <td style="text-align:center"><a href="{% url 'pdf_app:pdf_delete' pk=pdf.id %}">Delete</a></td>
-          <td style="text-align:right">Email</a></td>
+          <td style="text-align:center"><a href="{% url 'send_email_app:email_create' pdf_id=pdf.id %}">Email</a>
+          </td>
       </tr>
       {% endfor %}
     </table>
   </div>
 </div>
 <br><br>
-blah1 {{ MEDIA_URL }}!
-blah2 {{ pdf.filename }}!
+
+<div class="entries">
+  <h4><strong>Attachments</strong>
+      <a href="{% url 'invoice_attachment_app:invoice_attachment_upload' invoice_id=invoice.pk %}" class="btn btn-sm btn-success"
+       role="button">Upload Attachment</a>
+  </h4>
+  <div class="datagrid">
+    <table>
+      <thead>
+        <tr>
+          <th width="80%"><strong>Description</strong></th>
+          <th width="20%" style="text-align:center"><strong>Delete</strong></th>
+        </tr>
+      </thead>
+      {% for attachment in attachments %}
+      <tr style="{% cycle 'background: white' 'background: #F0F0F0' %}">
+          <td><a href="../media/{{ attachment.filename }}" target="_blank">{{ attachment.description }}</a></td>
+          <td style="text-align:center"><a href="{% url 'invoice_attachment_app:invoice_attachment_delete' pk=attachment.id %}">Delete</a></td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+<br><br>
+
+
+
+<div class="entries">
+  <h4><strong>Email Log</strong></h4>
+  <div class="datagrid">
+    <table>
+      <thead>
+        <tr>
+          <th width="15%"><strong>Date</strong></th>
+          <th width="10%"><strong>To</strong></th>
+          <th width="15%"><strong>Subject</strong></th>
+          <th width="55%"><strong>Body</strong></th>
+          <th width="10%"><strong>Successful</strong></th>
+        </tr>
+      </thead>
+      {% for email in email_log %}
+      <tr style="{% cycle 'background: white' 'background: #F0F0F0' %}">
+          <td>{{ email.timestamp }}</td>
+          <td>{{ email.to_address }}</td>
+          <td>{{ email.subject }}</a></td>
+          <td>{{ email.body }}</td>
+          {% if not email.successful %}
+            <td style="color:red text-align:center">
+          {% else %}<td style="text-align:center">
+        {% endif %}{{ email.successful }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+
+
+<br><br>
+
+
 
 <br>
-
-    <a href="{% url 'pdf_app:pdf_view_invoice' invoice_id=invoice.pk %}" target="_blank" class="btn btn-sm btn-info"
-       role="button">View Invoice</a>
-
-    <a href="{% url 'pdf_app:pdf_save_invoice' invoice_id=invoice.pk %}" class="btn btn-sm btn-info"
-       role="button">Save Invoice</a>
 
 {% endblock content %}

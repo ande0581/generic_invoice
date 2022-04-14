@@ -15,6 +15,8 @@ from .models import Invoice
 
 from django.apps import apps
 Customer = apps.get_model('customer', 'Customer')
+Document = apps.get_model('invoice_attachment', 'Document')
+EmailLog = apps.get_model('send_email', 'EmailLog')
 InvoiceItem = apps.get_model('invoice_item', 'InvoiceItem')
 PDFImage = apps.get_model('pdf', 'PDFImage')
 
@@ -63,18 +65,41 @@ class InvoiceDetail(LoginRequiredMixin, DetailView):
         context['invoicing_items'] = invoicing_items_obj
         context['invoiced_items'] = invoiced_items_obj
         context['saved_invoices'] = PDFImage.objects.filter(invoice=invoice_obj)
-        context['invoicing_items_total'] = invoicing_items_obj.aggregate(Sum('cost'))['cost__sum']
-        context['invoiced_items_total'] = invoiced_items_obj.aggregate(Sum('cost'))['cost__sum']
+        context['attachments'] = Document.objects.filter(invoice=invoice_obj)
+        context['email_log'] = EmailLog.objects.filter(invoice=invoice_obj)
+        invoicing_items_total = invoicing_items_obj.aggregate(Sum('cost'))['cost__sum']
+        invoiced_items_total = invoiced_items_obj.aggregate(Sum('cost'))['cost__sum']
+        context['invoicing_items_total'] = invoicing_items_total
+        context['invoiced_items_total'] = invoiced_items_total
 
-        # context['invoicing_party_total'] = invoice_obj
-        # context['generic_invoice_pk'] = self.kwargs['pk']
-        # # context['emails'] = EmailLog.objects.filter(customer_id=self.kwargs['pk'])
+        if invoicing_items_total:
+            context['invoicing_items_total_half'] = invoicing_items_total / 2
+        else:
+            context['invoicing_items_total_half'] = 0
+
+        if invoiced_items_total:
+            context['invoiced_items_total_half'] = invoiced_items_total / 2
+        else:
+            context['invoiced_items_total_half'] = 0
+
+        if invoiced_items_total and invoicing_items_total:
+
+            if invoicing_items_total > invoiced_items_total:
+                context['the_owing_party'] = f"{invoice_obj.invoiced_party.first_name} Owes"
+                context['the_owing_total'] = (invoicing_items_total / 2) - (invoiced_items_total / 2)
+            elif invoicing_items_total < invoiced_items_total:
+                context['the_owing_party'] = f"{invoice_obj.invoicing_party.first_name} Owes"
+                context['the_owing_total'] = (invoiced_items_total / 2) - (invoicing_items_total / 2)
+            elif invoicing_items_total == invoiced_items_total:
+                context['the_owing_party'] = "Nobody Owes"
+                context['the_owing_total'] = 0
+            else:
+                raise(NotImplemented)
+        else:
+            context['the_owing_party'] = ""
+            context['the_owing_total'] = 0
+
         return context
-
-    # def get_context_data(self, **kwargs):
-    #     context = super(BidDetail, self).get_context_data(**kwargs)
-    #     bid_obj = Bid.objects.get(id=self.kwargs['pk'])
-    #     bid_item_obj = BidItem.objects.filter(bid=self.kwargs['pk'])
 
 
 class InvoiceList(LoginRequiredMixin, ListView):
