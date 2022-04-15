@@ -38,7 +38,7 @@ class CustomerDetail(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(CustomerDetail, self).get_context_data(**kwargs)
-        context['invoices'] = Invoice.objects.filter(invoiced_party_id=self.kwargs['pk'])
+        context['invoices'] = Invoice.objects.filter(invoiced_party_id=self.kwargs['pk']).order_by('-id')
         return context
 
 
@@ -53,10 +53,7 @@ class CustomerList(LoginRequiredMixin, ListView):
         if query:
             queryset_list = queryset_list.filter(
                 Q(first_name__icontains=query) |
-                Q(last_name__icontains=query) |
-                Q(company_name__icontains=query) |
-                Q(telephone__icontains=query) |
-                Q(email__icontains=query)
+                Q(last_name__icontains=query)
             ).distinct()
 
         return queryset_list

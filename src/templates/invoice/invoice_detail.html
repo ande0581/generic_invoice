@@ -2,8 +2,9 @@
 
 {% block content %}
 
-<strong>{{ invoiced_party.first_name }} {{ invoiced_party.last_name }} - {{ object.description|upper }} </strong><br>
-Invoice Created: {{ object.created_date }}<br><br>
+<strong>{{ invoiced_party.first_name }} {{ invoiced_party.last_name }} - {{ object.description|upper }}</strong><br>
+Invoice Number {{ object.id }}<br>
+Created: {{ object.created_date }}<br><br>
 <a href="{% url 'invoice_app:invoice_update' pk=invoice.pk %}" class="btn btn-sm btn-info">Edit Description</a>
 <a href="{% url 'pdf_app:pdf_view_invoice' invoice_id=invoice.pk %}" target="_blank" class="btn btn-sm btn-primary"
 role="button">Preview Invoice</a>
@@ -175,8 +176,9 @@ role="button">Preview Invoice</a>
           <th width="15%"><strong>Date</strong></th>
           <th width="10%"><strong>To</strong></th>
           <th width="15%"><strong>Subject</strong></th>
-          <th width="55%"><strong>Body</strong></th>
+          <th width="45%"><strong>Body</strong></th>
           <th width="10%"><strong>Successful</strong></th>
+          <th width="20%"><strong>Invoice Name</strong></th>
         </tr>
       </thead>
       {% for email in email_log %}
@@ -189,6 +191,7 @@ role="button">Preview Invoice</a>
             <td style="color:red text-align:center">
           {% else %}<td style="text-align:center">
         {% endif %}{{ email.successful }}</td>
+          <td>{{ email.invoice_attachment }}</td>
       </tr>
       {% endfor %}
     </table>

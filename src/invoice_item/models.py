@@ -10,7 +10,7 @@ class InvoiceItem(models.Model):
     cost = models.FloatField(null=True)
 
     class Meta:
-        verbose_name_plural = 'InvoicePartyItems'
+        verbose_name_plural = 'Invoice Items'
 
     def __str__(self):
         return self.description

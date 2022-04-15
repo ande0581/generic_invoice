@@ -22,6 +22,9 @@ class PDFImage(models.Model):
     def get_absolute_url(self):
         return reverse('invoice_app:invoice_detail', kwargs={'pk': self.invoice_id})
 
+    class Meta:
+        verbose_name_plural = 'PDF Images'
+
     def __str__(self):
         return str(self.filename)
 

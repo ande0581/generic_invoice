@@ -10,13 +10,15 @@
     <table>
       <thead>
         <tr>
-          <th width="20%"><strong>Created Date</strong></th>
+          <th width="5%"><strong>ID</strong></th>
+          <th width="15%"><strong>Created Date</strong></th>
           <th width="30%"><strong>Customer</strong></th>
           <th width="50%"><strong>Description</strong></th>
         </tr>
       </thead>
       {% for invoice in object_list %}
           <tr style="{% cycle 'background: white' 'background: #F0F0F0' %}">
+                <td>{{ invoice.id }}</td>
                 <td>{{ invoice.created_date|date}}</td>
               <td>{{ invoice.invoiced_party }}</td>
               <td><a href="{% url 'invoice_app:invoice_detail' pk=invoice.pk %}">{{ invoice.description }}</a></td>

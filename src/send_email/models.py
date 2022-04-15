@@ -9,6 +9,7 @@ class EmailLog(models.Model):
     body = models.CharField(max_length=2000)
     successful = models.BooleanField()
     invoice = models.ForeignKey('invoice.Invoice', on_delete=models.CASCADE)
+    invoice_attachment = models.CharField(max_length=100)
 
     class Meta:
         ordering = ['-timestamp']

@@ -31,13 +31,13 @@ def log_email(**kwargs):
     email_entry.body = kwargs['body']
     email_entry.successful = kwargs['successful']
     email_entry.invoice = invoice_obj
+    email_entry.invoice_attachment = kwargs['invoice_attachment']
     email_entry.save()
 
 
-def send_email(pdf_id, to_address, body, attachments):
+def send_email(pdf_id, to_address, subject, body, attachments):
     pdf_obj = PDFImage.objects.get(pk=pdf_id)
     from_address = config('EMAIL_HOST_USER')
-    subject = 'Invoice: {}'.format(pdf_obj.invoice.description)
     email = EmailMessage(subject, body, from_address, [to_address])
 
     # Attach PDF
@@ -53,13 +53,17 @@ def send_email(pdf_id, to_address, body, attachments):
     except Exception:
         response = 0
 
+    # invoice attachment filename
+    folder1, folder2, pdf_filename = str(pdf_obj.filename).split('/')
+
     # Log email in DB
     email_log_entry = {
         'to_address': to_address,
         'subject': subject,
         'body': body,
         'successful': response,
-        'invoice_id': pdf_obj.invoice.id
+        'invoice_id': pdf_obj.invoice.id,
+        'invoice_attachment': pdf_filename
     }
 
     log_email(**email_log_entry)
@@ -71,6 +75,14 @@ class InvoiceEmailCreate(LoginRequiredMixin, SuccessMessageMixin, FormView):
 
     template_name = 'send_email/send_email_form.html'
 
+    def get_initial(self):
+        initial = super().get_initial()
+        pdf_obj = PDFImage.objects.get(pk=self.kwargs['pdf_id'])
+        email_subject = f"{pdf_obj.invoice.invoiced_party.first_name} Invoice #{pdf_obj.invoice.id:04} - {pdf_obj.invoice.description}"
+        initial['subject'] = email_subject
+        initial['body'] = f"{pdf_obj.invoice.invoiced_party.first_name},\n\nPlease see the attached invoice and let me know if you have any questions.\n\nThanks,\n\n{pdf_obj.invoice.invoicing_party.first_name}"
+        return initial
+
     def get_success_url(self):
         pdf_obj = PDFImage.objects.get(pk=self.kwargs['pdf_id'])
         return reverse('invoice_app:invoice_detail', kwargs={'pk': pdf_obj.invoice.id})
@@ -80,7 +92,8 @@ class InvoiceEmailCreate(LoginRequiredMixin, SuccessMessageMixin, FormView):
         pdf_obj = PDFImage.objects.get(pk=self.kwargs['pdf_id'])
         attachments = Document.objects.filter(invoice=pdf_obj.invoice.id)
         to_address = pdf_obj.invoice.invoiced_party.email
-        email_response = send_email(pdf_id=self.kwargs['pdf_id'], to_address=to_address, body=body,
+        subject = form.cleaned_data['subject']
+        email_response = send_email(pdf_id=self.kwargs['pdf_id'], to_address=to_address, subject=subject, body=body,
                                     attachments=attachments)
         if email_response:
             messages.success(self.request, 'Successfully sent email to {}'.format(to_address))

@@ -60,9 +60,9 @@ class InvoiceDetail(LoginRequiredMixin, DetailView):
         context['invoicing_party'] = Customer.objects.get(id=invoice_obj.invoicing_party.id)
         context['invoicing_items'] = invoicing_items_obj
         context['invoiced_items'] = invoiced_items_obj
-        context['saved_invoices'] = PDFImage.objects.filter(invoice=invoice_obj)
+        context['saved_invoices'] = PDFImage.objects.filter(invoice=invoice_obj).order_by('-created_date')
         context['attachments'] = Document.objects.filter(invoice=invoice_obj)
-        context['email_log'] = EmailLog.objects.filter(invoice=invoice_obj)
+        context['email_log'] = EmailLog.objects.filter(invoice=invoice_obj).order_by('-timestamp')
         invoicing_items_total = invoicing_items_obj.aggregate(Sum('cost'))['cost__sum']
         invoiced_items_total = invoiced_items_obj.aggregate(Sum('cost'))['cost__sum']
         context['invoicing_items_total'] = invoicing_items_total
@@ -109,14 +109,13 @@ class InvoiceList(LoginRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        queryset_list = Invoice.objects.order_by('created_date')
+        queryset_list = Invoice.objects.order_by('-id')
         query = self.request.GET.get('q')
 
         if query:
             queryset_list = queryset_list.filter(
-                Q(customer__first_name__icontains=query) |
-                Q(customer__last_name__icontains=query) |
-                Q(customer__company_name__icontains=query) |
+                Q(invoiced_party__first_name__icontains=query) |
+                Q(invoiced_party__last_name__icontains=query) |
                 Q(description__icontains=query)
             ).distinct()
 
