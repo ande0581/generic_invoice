@@ -9,7 +9,7 @@ class InvoiceItemForm(forms.ModelForm):
 
     class Meta:
         model = InvoiceItem
-        fields = ('description', 'cost')
+        fields = ('description', 'cost', 'split_percentage')
 
     helper = FormHelper()
     helper.form_method = 'POST'
