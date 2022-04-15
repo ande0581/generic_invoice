@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
@@ -7,7 +8,6 @@ from django.views.generic.edit import FormView, DeleteView
 from .models import Document
 from .forms import DocumentForm
 
-from django.apps import apps
 Invoice = apps.get_model('invoice', 'Invoice')
 
 

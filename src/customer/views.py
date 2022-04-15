@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
@@ -9,8 +10,6 @@ from django.views.generic.list import ListView
 
 from .models import Customer
 from .forms import CustomerForm
-
-from django.apps import apps
 Invoice = apps.get_model('invoice', 'Invoice')
 
 
@@ -39,31 +38,8 @@ class CustomerDetail(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(CustomerDetail, self).get_context_data(**kwargs)
-        print('jimmy', self.kwargs)
         context['invoices'] = Invoice.objects.filter(invoiced_party_id=self.kwargs['pk'])
         return context
-
-        # context = super(BidDetail, self).get_context_data(**kwargs)
-        # bid_obj = Bid.objects.get(id=self.kwargs['pk'])
-        # bid_item_obj = BidItem.objects.filter(bid=self.kwargs['pk'])
-        # bid_item_dict = create_bid_item_dict(bid_obj)
-        # total_cost = bid_item_obj.aggregate(Sum('total'))['total__sum']
-        # payment_obj = Payment.objects.filter(bid=self.kwargs['pk'])
-        # total_payments = payment_obj.aggregate(Sum('amount'))['amount__sum']
-        #
-        # context['bid_item_dict'] = bid_item_dict
-        # context['total_cost'] = total_cost
-        # context['pdfs'] = PDFImage.objects.all().filter(bid=self.kwargs['pk'])
-        # context['journal_entries'] = Journal.objects.all().filter(bid=self.kwargs['pk']).order_by('-timestamp')
-        # context['payments'] = Payment.objects.all().filter(bid=self.kwargs['pk']).order_by('date')
-        # context['date'] = date.today()
-        #
-        # if total_payments:
-        #     context['remaining_balance'] = total_cost - total_payments
-        # else:
-        #     context['remaining_balance'] = total_cost
-        #
-        # return context
 
 
 class CustomerList(LoginRequiredMixin, ListView):

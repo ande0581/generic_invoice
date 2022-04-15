@@ -27,6 +27,8 @@ role="button">Preview Invoice</a>
           <th style="text-align:right" width="10%"><strong>Cost</strong></th>
         </tr>
       </thead>
+      {% if invoicing_items %}
+
       {% for item in invoicing_items %}
       <tr style="{% cycle 'background: white' 'background: #F0F0F0' %}">
           <td>{{ item.description }}</td>
@@ -38,18 +40,20 @@ role="button">Preview Invoice</a>
 
       <thead>
       <tr>
-          <th colspan="3" width="75px"><strong>Total Paid By {{ invoicing_party.first_name }}</strong></th>
-          <th style="text-align:right"><strong>${{ invoicing_items_total|floatformat:2 }}</strong></th>
+          <th colspan="3" width="75px" style="background:silver"><strong>Total Paid By {{ invoicing_party.first_name }}</strong></th>
+          <th style="text-align:right; background:silver"><strong>${{ invoicing_items_total|floatformat:2 }}</strong></th>
       </tr>
 
       <tr>
-          <th colspan="3" width="75px" style="background:gray"><strong>Half Owed By {{ invoiced_party.first_name }}</strong></th>
-          <th style="text-align:right; background:gray"><strong>${{ invoicing_items_total_half|floatformat:2 }}</strong></th>
+          <th colspan="3" width="75px"><strong>Half Owed By {{ invoiced_party.first_name }}</strong></th>
+          <th style="text-align:right"><strong>${{ invoicing_items_total_half|floatformat:2 }}</strong></th>
       </tr>
       </thead>
+     {% endif %}
     </table>
   </div>
 </div>
+
 <br>
 
 <div class="entries">
@@ -72,21 +76,23 @@ role="button">Preview Invoice</a>
       </tr>
       {% endfor %}
 
+    {% if invoiced_items_total %}
       <thead>
       <tr>
-          <th colspan="3" width="75px"><strong>Total Paid By {{ invoiced_party.first_name }}</strong></th>
-          <th style="text-align:right;"><strong>${{ invoiced_items_total|floatformat:2 }}</strong></th>
+          <th colspan="3" width="75px" style="background:silver"><strong>Total Paid By {{ invoiced_party.first_name }}</strong></th>
+          <th style="text-align:right; background:silver"><strong>${{ invoiced_items_total|floatformat:2 }}</strong></th>
       </tr>
 
       <tr>
-          <th colspan="3" width="75px" style="background:gray"><strong>Half Owed By {{ invoicing_party.first_name }}</strong></th>
-          <th style="text-align:right; background:gray"><strong>${{ invoiced_items_total_half|floatformat:2 }}</strong></th>
+          <th colspan="3" width="75px"><strong>Half Owed By {{ invoicing_party.first_name }}</strong></th>
+          <th style="text-align:right"><strong>${{ invoiced_items_total_half|floatformat:2 }}</strong></th>
       </tr>
       </thead>
-
+    {% endif %}
     </table>
   </div>
 </div>
+
 
 <br>
 <div class="entries">

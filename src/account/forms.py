@@ -23,7 +23,6 @@ class UserLoginForm(forms.Form):
 
         the_user = authenticate(username=username, password=password)
         if not the_user:
-            # TODO log auth tries
             raise forms.ValidationError("Invalid Credentials")
 
         return super(UserLoginForm, self).clean()

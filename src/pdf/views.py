@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -7,12 +8,11 @@ from django.views.generic import ListView
 
 from .pdf_template import generate_pdf
 from .models import PDFImage
-# from bid.models import Bid
-# from bid_item.models import BidItem
-from django.apps import apps
+
 Invoice = apps.get_model('invoice', 'Invoice')
 InvoiceItem = apps.get_model('invoice_item', 'InvoiceItem')
 
+# TODO clean-up pdf.views
 
 # def create_bid_item_dict(bid_obj):
 #     """

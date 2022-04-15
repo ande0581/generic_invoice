@@ -1,3 +1,4 @@
+from django.apps import apps
 from decouple import config
 from django.core.mail import EmailMessage
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -9,7 +10,6 @@ import datetime
 
 from .models import EmailLog
 
-from django.apps import apps
 Document = apps.get_model('invoice_attachment', 'Document')
 Invoice = apps.get_model('invoice', 'Invoice')
 PDFImage = apps.get_model('pdf', 'PDFImage')

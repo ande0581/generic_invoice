@@ -2,9 +2,6 @@ from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 
-# from django.apps import apps
-# Document = apps.get_model('invoice_attachment', 'Document')
-
 
 class SendEmailForm(forms.Form):
 

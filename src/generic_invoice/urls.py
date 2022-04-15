@@ -19,10 +19,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('', include('customer.urls')),
     path('account/', include('account.urls')),
     path('admin/', admin.site.urls),
     path('customer/', include('customer.urls')),
-    path('', include('invoice.urls')),
     path(r'invoice/', include('invoice.urls')),
     path(r'invoice/', include('invoice_attachment.urls')),
     path(r'invoice_item/', include('invoice_item.urls')),

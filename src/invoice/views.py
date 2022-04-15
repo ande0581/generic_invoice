@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
@@ -8,12 +9,8 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.list import ListView
 
 from .forms import InvoiceForm
-# from address.models import Address
-# from generic_invoice_item.models import GenericInvoiceItem
 from .models import Invoice
-# from send_email.models import EmailLog
 
-from django.apps import apps
 Customer = apps.get_model('customer', 'Customer')
 Document = apps.get_model('invoice_attachment', 'Document')
 EmailLog = apps.get_model('send_email', 'EmailLog')
@@ -28,7 +25,6 @@ class InvoiceCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     success_message = "Invoice Successfully Added"
     
     def form_valid(self, form):
-        print('homer', self.kwargs)
         form.instance.customer = Customer.objects.get(pk=self.kwargs['customer'])
         return super(InvoiceCreate, self).form_valid(form)
 
@@ -94,7 +90,13 @@ class InvoiceDetail(LoginRequiredMixin, DetailView):
                 context['the_owing_party'] = "Nobody Owes"
                 context['the_owing_total'] = 0
             else:
-                raise(NotImplemented)
+                raise NotImplemented
+        elif invoicing_items_total and not invoiced_items_total:
+            context['the_owing_party'] = f"{invoice_obj.invoiced_party.first_name} Owes"
+            context['the_owing_total'] = (invoicing_items_total / 2)
+        elif invoiced_items_total and not invoicing_items_total:
+            context['the_owing_party'] = f"{invoice_obj.invoicing_party.first_name} Owes"
+            context['the_owing_total'] = (invoiced_items_total / 2)
         else:
             context['the_owing_party'] = ""
             context['the_owing_total'] = 0
