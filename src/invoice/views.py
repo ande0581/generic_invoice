@@ -82,11 +82,11 @@ class InvoiceDetail(LoginRequiredMixin, DetailView):
         # total amount sara paid
         sara_paid_total = invoiced_items_obj.aggregate(Sum('invoiced_party_cost'))['invoiced_party_cost__sum']
 
-        # # what tom owes
-        # what_tom_owes = invoiced_items_obj.aggregate(Sum('invoicing_party_cost'))['invoicing_party_cost__sum']
-        #
-        # # what sara owes
-        # what_sara_owes = invoicing_items_obj.aggregate(Sum('invoiced_party_cost'))['invoiced_party_cost__sum']
+        # what tom owes
+        what_tom_owes = invoiced_items_obj.aggregate(Sum('invoicing_party_cost'))['invoicing_party_cost__sum']
+
+        # what sara owes
+        what_sara_owes = invoicing_items_obj.aggregate(Sum('invoiced_party_cost'))['invoiced_party_cost__sum']
 
         context['invoicing_items_total'] = invoicing_items_total
         context['invoiced_items_total'] = invoiced_items_total
@@ -94,26 +94,22 @@ class InvoiceDetail(LoginRequiredMixin, DetailView):
         context['tom_paid_total'] = tom_paid_total
         context['sara_paid_total'] = sara_paid_total
 
-        # context['invoicing_party_total_tom'] = tom_paid_total
-        # context['invoiced_party_total_sara'] = sara_paid_total
+        context['what_tom_owes'] = what_tom_owes
+        context['what_sara_owes'] = what_sara_owes
 
-        if not tom_paid_total:
-            tom_paid_total = 0
+        if not what_tom_owes:
+            what_tom_owes = 0
 
-        if not sara_paid_total:
-            sara_paid_total = 0
+        if not what_sara_owes:
+            what_sara_owes = 0
 
-        # tom_total_cost = invoicing_party_total_tom + invoiced_party_total_tom
-        # sara_total_cost = invoicing_party_total_sara + invoiced_party_total_sara
-        #
-
-        if tom_paid_total > sara_paid_total:
-            context['the_owing_party'] = f"{invoice_obj.invoiced_party.first_name}"
-            context['the_owing_total'] = tom_paid_total - sara_paid_total
-        elif sara_paid_total > tom_paid_total:
-            context['the_owing_party'] = f"{invoice_obj.invoicing_party.first_name}"
-            context['the_owing_total'] = sara_paid_total - tom_paid_total
-        elif tom_paid_total == sara_paid_total:
+        if what_tom_owes > what_sara_owes:
+            context['the_owing_party'] = f"{invoice_obj.invoicing_party.first_name} Owes"
+            context['the_owing_total'] = what_tom_owes - what_sara_owes
+        elif what_sara_owes > what_tom_owes:
+            context['the_owing_party'] = f"{invoice_obj.invoiced_party.first_name} Owes"
+            context['the_owing_total'] = what_sara_owes - what_tom_owes
+        elif what_tom_owes == what_sara_owes:
             context['the_owing_party'] = "Nobody Owes"
             context['the_owing_total'] = 0
 

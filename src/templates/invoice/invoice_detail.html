@@ -25,7 +25,7 @@ role="button">Preview Invoice</a>
           <th width="40%"><strong>{{ invoicing_party.first_name }} Items <a style="color:#5cb85c" href="{% url 'invoice_item_app:invoice_item_create' invoice=invoice.pk is_invoicing_party='True' %}">(Add)</a></strong></th>
           <th style="text-align:center" width="10%"><strong>Delete</strong></th>
           <th style="text-align:center" width="10%"><strong>Split %</strong></th>
-          <th style="text-align:right" width="15%"><strong>{{ invoicing_party.first_name }} Paid</strong></th>
+          <th style="text-align:right" width="15%"><strong>{{ invoicing_party.first_name }}</strong></th>
           <th style="text-align:right" width="15%"><strong>{{ invoiced_party.first_name }} Owes</strong></th>
           <th style="text-align:right" width="10%"><strong>Total</strong></th>
         </tr>
@@ -46,8 +46,8 @@ role="button">Preview Invoice</a>
       <thead>
       <tr>
           <th colspan="3" width="75px" style="background:gray"><strong>Total</strong></th>
-          <th style="text-align:right; background:gray">{{ invoicing_party_total_tom|floatformat:2 }}</th>
-          <th style="text-align:right; background:gray">{{ invoicing_party_total_sara|floatformat:2 }}</th>
+          <th style="text-align:right; background:gray">{{ tom_paid_total|floatformat:2 }}</th>
+          <th style="text-align:right; background:gray">{{ what_sara_owes|floatformat:2 }}</th>
           <th style="text-align:right; background:gray"><strong>${{ invoicing_items_total|floatformat:2 }}</strong></th>
       </tr>
       </thead>
@@ -66,8 +66,8 @@ role="button">Preview Invoice</a>
           <th width="40%"><strong>{{ invoiced_party.first_name }} Items <a style="color:#5cb85c" href="{% url 'invoice_item_app:invoice_item_create' invoice=invoice.pk is_invoicing_party='False' %}">(Add)</a></strong></th>
           <th style="text-align:center" width="10%"><strong>Delete</strong></th>
           <th style="text-align:center" width="10%"><strong>Split %</strong></th>
+          <th style="text-align:right" width="15%"><strong>{{ invoiced_party.first_name }}</strong></th>
           <th style="text-align:right" width="15%"><strong>{{ invoicing_party.first_name }} Owes</strong></th>
-          <th style="text-align:right" width="15%"><strong>{{ invoiced_party.first_name }} Paid</strong></th>
           <th style="text-align:right" width="10%"><strong>Total</strong></th>
         </tr>
       </thead>
@@ -76,8 +76,8 @@ role="button">Preview Invoice</a>
           <td><a href="{% url 'invoice_item_app:invoice_item_update' pk=item.id %}">{{ item.description }}</a></td>
           <td style="text-align:center"><a href="{% url 'invoice_item_app:invoice_item_delete' pk=item.id %}">Delete</a></td>
           <td style="text-align:center">{{ item.split_percentage }}</td>
-          <td style="text-align:right">{{ item.invoicing_party_cost|floatformat:2 }}</td>
           <td style="text-align:right">{{ item.invoiced_party_cost|floatformat:2 }}</td>
+          <td style="text-align:right">{{ item.invoicing_party_cost|floatformat:2 }}</td>
           <td style="text-align:right">{{ item.cost|floatformat:2  }}</td>
       </tr>
       {% endfor %}
@@ -86,8 +86,8 @@ role="button">Preview Invoice</a>
       <thead>
       <tr>
           <th colspan="3" width="75px" style="background:gray"><strong>Total</strong></th>
-          <th style="text-align:right; background:gray">{{ invoiced_party_total_tom|floatformat:2 }}</th>
-          <th style="text-align:right; background:gray">{{ invoiced_party_total_sara|floatformat:2 }}</th>
+          <th style="text-align:right; background:gray">{{ sara_paid_total|floatformat:2 }}</th>
+          <th style="text-align:right; background:gray">{{ what_tom_owes|floatformat:2 }}</th>
           <th style="text-align:right; background:gray"><strong>${{ invoiced_items_total|floatformat:2 }}</strong></th>
       </tr>
       </thead>
@@ -103,16 +103,16 @@ role="button">Preview Invoice</a>
     <table>
       <thead>
         <tr>
-          <th width="70%"><strong>Summary</strong></th>
-            <th width="10%"style="text-align:center">{{ invoicing_party.first_name }} Paid</th>
-            <th width="10%"style="text-align:center">{{ invoiced_party.first_name }} Paid</th>
+          <th width="60%"><strong>Summary</strong></th>
+            <th width="15%"style="text-align:right">{{ invoicing_party.first_name }} Owes</th>
+            <th width="15%"style="text-align:right">{{ invoiced_party.first_name }} Owes</th>
           <th width="10%" style="text-align:right"><strong>Difference</strong></th>
         </tr>
       </thead>
         <tr>
             <th>{{ the_owing_party }} ${{ the_owing_total|floatformat:2 }}</th>
-            <th style="text-align:right">{{ tom_paid_total|floatformat:2 }}</th>
-            <th style="text-align:right">{{ sara_paid_total|floatformat:2 }}</th>
+            <th style="text-align:right">{{ what_tom_owes|floatformat:2 }}</th>
+            <th style="text-align:right">{{ what_sara_owes|floatformat:2 }}</th>
             <th style="text-align:right">{{ the_owing_total|floatformat:2 }}</th>
         </tr>
         </thead>
