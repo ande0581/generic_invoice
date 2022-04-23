@@ -125,7 +125,7 @@ def generate_pdf(request, obj, invoice_item_dict, save_to_disk=False):
     story.append(t1)
 
     # Add Title to PDF
-    title = 'Invoice Title'
+    title = 'Invoice'
     data1 = [[Paragraph(title, styles["Line_Data_Largest"])]]
 
     t1 = Table(data1, colWidths=(18.6 * cm))
@@ -162,36 +162,16 @@ def generate_pdf(request, obj, invoice_item_dict, save_to_disk=False):
     ]))
 
     story.append(t1)
-    story.append(Spacer(4, 20))
 
-    # # Add Invoice Description
-    # description_paragraph = obj.description
-    # data1 = [[Paragraph('Job Description', styles["Line_Data_Large"])],
-    #          [Paragraph(description_paragraph, styles["Line_Data_Large"])]]
-    #
-    # t1 = Table(data1, colWidths=(18.6 * cm))
-    # t1.setStyle(TableStyle([
-    #     ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-    #     ('BACKGROUND', (0, 0), (1, 0), colors.lightgrey)
-    # ]))
-    #
-    # story.append(t1)
-
-    # Add Invoice Items to PDF
+    # Add a space between tables
     story.append(Spacer(4, 32))
 
-    # print('airplane', invoice_item_dict['invoicing_items_obj'])
-    # print(type(invoice_item_dict['invoicing_items_obj']))
-    #
-    # for item in invoice_item_dict['invoicing_items_obj']:
-    #     print('jet', item)
-
-    # Add Title to Items Section
+    # Add Title to Invoicing Party Items Section - Tom's Section
     title = [[Paragraph(f"{obj.invoicing_party.first_name}'s Items", styles["Line_Data_Large"]),
-              Paragraph('Split %', styles["Line_Data_Large"]),
-              Paragraph(f'{obj.invoicing_party.first_name }', styles["Line_Data_Large"]),
-              Paragraph(f'{obj.invoiced_party.first_name} Owes', styles["Line_Data_Large"]),
-              Paragraph('Total', styles["Line_Data_Large"]),
+              Paragraph('Split %', styles["Line_Data_Large_Center"]),
+              Paragraph(f'{obj.invoicing_party.first_name }', styles["Line_Data_Large_Right"]),
+              Paragraph(f'{obj.invoiced_party.first_name} Owes', styles["Line_Data_Large_Right"]),
+              Paragraph('Total', styles["Line_Data_Large_Right"]),
              ]]
 
     t1 = Table(title, colWidths=(7.6 * cm, 2 * cm, 3 * cm, 3 * cm, 3 * cm))
@@ -199,21 +179,136 @@ def generate_pdf(request, obj, invoice_item_dict, save_to_disk=False):
         ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
         ('BOX', (0, 0), (-1, -1), .25, colors.black),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('BACKGROUND', (0, 0), (-1, -1), colors.lightgrey)
+        ('BACKGROUND', (0, 0), (-1, -1), colors.darkgrey)
     ]))
 
     story.append(t1)
 
     # Add Invoicing Items
     data1 = [[Paragraph(str(item.description), styles["Line_Data_Large"]),
-              Paragraph(str(item.split_percentage), styles["Line_Data_Large_Right"]),
-              Paragraph(str(item.invoicing_party_cost), styles["Line_Data_Large_Right"]),
-              Paragraph(str(item.invoiced_party_cost), styles["Line_Data_Large_Right"]),
+              Paragraph(str(item.split_percentage), styles["Line_Data_Large_Center"]),
+              Paragraph(str("{0:.2f}".format(round(item.invoicing_party_cost, 2))), styles["Line_Data_Large_Right"]),
+              Paragraph(str("{0:.2f}".format(round(item.invoiced_party_cost, 2))), styles["Line_Data_Large_Right"]),
               Paragraph(str("{0:.2f}".format(round(item.cost, 2))), styles["Line_Data_Large_Right"])] for item
              in
              invoice_item_dict['invoicing_items_obj']]
 
     t1 = Table(data1, colWidths=(7.6 * cm, 2 * cm, 3 * cm, 3 * cm, 3 * cm))
+    t1.setStyle(TableStyle([
+        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ]))
+
+    story.append(t1)
+
+    # Add Total for Invoicing Items
+    invoicing_items_summary = [[Paragraph(f"Total", styles["Line_Data_Large"]),
+                                Paragraph('', styles["Line_Data_Large"]),
+                                Paragraph(str("{0:.2f}".format(round(invoice_item_dict['tom_paid_total'], 2))), styles["Line_Data_Large_Right"]),
+                                Paragraph(str("{0:.2f}".format(round(invoice_item_dict['what_sara_owes'], 2))), styles["Line_Data_Large_Right"]),
+                                Paragraph(str("{0:.2f}".format(round(invoice_item_dict['invoicing_items_total'], 2))), styles["Line_Data_Large_Right"])]]
+
+    t1 = Table(invoicing_items_summary, colWidths=(7.6 * cm, 2 * cm, 3 * cm, 3 * cm, 3 * cm))
+    t1.setStyle(TableStyle([
+        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BACKGROUND', (0, 0), (-1, -1), colors.gainsboro)
+    ]))
+
+    story.append(t1)
+
+    # Add a space between tables
+    story.append(Spacer(4, 32))
+
+    # Add Title to Invoiced Party Items Section - Sara's Section
+    title = [[Paragraph(f"{obj.invoiced_party.first_name}'s Items", styles["Line_Data_Large"]),
+              Paragraph('Split %', styles["Line_Data_Large_Center"]),
+              Paragraph(f'{obj.invoiced_party.first_name }', styles["Line_Data_Large_Right"]),
+              Paragraph(f'{obj.invoicing_party.first_name} Owes', styles["Line_Data_Large_Right"]),
+              Paragraph('Total', styles["Line_Data_Large_Right"]),
+             ]]
+
+    t1 = Table(title, colWidths=(7.6 * cm, 2 * cm, 3 * cm, 3 * cm, 3 * cm))
+    t1.setStyle(TableStyle([
+        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+        ('BOX', (0, 0), (-1, -1), .25, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BACKGROUND', (0, 0), (-1, -1), colors.darkgrey)
+    ]))
+
+    story.append(t1)
+
+    # Add Invoiced Items
+    data1 = [[Paragraph(str(item.description), styles["Line_Data_Large"]),
+              Paragraph(str(item.split_percentage), styles["Line_Data_Large_Center"]),
+              Paragraph(str("{0:.2f}".format(round(item.invoiced_party_cost, 2))), styles["Line_Data_Large_Right"]),
+              Paragraph(str("{0:.2f}".format(round(item.invoicing_party_cost, 2))), styles["Line_Data_Large_Right"]),
+              Paragraph(str("{0:.2f}".format(round(item.cost, 2))), styles["Line_Data_Large_Right"])] for item
+             in
+             invoice_item_dict['invoiced_items_obj']]
+
+    t1 = Table(data1, colWidths=(7.6 * cm, 2 * cm, 3 * cm, 3 * cm, 3 * cm))
+    t1.setStyle(TableStyle([
+        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ]))
+
+    story.append(t1)
+
+    # Add Total for Invoiced Items
+    invoicing_items_summary = [[Paragraph(f"Total", styles["Line_Data_Large"]),
+                                Paragraph('', styles["Line_Data_Large"]),
+                                Paragraph(str("{0:.2f}".format(round(invoice_item_dict['sara_paid_total'], 2))), styles["Line_Data_Large_Right"]),
+                                Paragraph(str("{0:.2f}".format(round(invoice_item_dict['what_tom_owes'], 2))), styles["Line_Data_Large_Right"]),
+                                Paragraph(str("{0:.2f}".format(round(invoice_item_dict['invoiced_items_total'], 2))), styles["Line_Data_Large_Right"])]]
+
+    t1 = Table(invoicing_items_summary, colWidths=(7.6 * cm, 2 * cm, 3 * cm, 3 * cm, 3 * cm))
+    t1.setStyle(TableStyle([
+        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BACKGROUND', (0, 0), (-1, -1), colors.gainsboro)
+    ]))
+
+    story.append(t1)
+
+    # Add a space between tables
+    story.append(Spacer(4, 32))
+
+
+
+
+
+    # Add Summary of Who Owes to Invoice
+    title = [[Paragraph(f"Summary", styles["Line_Data_Large"]),
+              Paragraph(f'{obj.invoicing_party.first_name} Owes', styles["Line_Data_Large_Right"]),
+              Paragraph(f'{obj.invoiced_party.first_name} Owes', styles["Line_Data_Large_Right"]),
+              Paragraph('Difference', styles["Line_Data_Large_Right"]),
+              ]]
+
+    t1 = Table(title, colWidths=(9.6 * cm, 3 * cm, 3 * cm, 3 * cm))
+    t1.setStyle(TableStyle([
+        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+        ('BOX', (0, 0), (-1, -1), .25, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BACKGROUND', (0, 0), (-1, -1), colors.darkgrey)
+    ]))
+
+    story.append(t1)
+
+    # Add Summary Values
+    invoicing_items_summary = [[Paragraph(f"{invoice_item_dict['the_owing_party']}", styles["Line_Data_Large"]),
+                                Paragraph(str("{0:.2f}".format(round(invoice_item_dict['what_tom_owes'], 2))),
+                                          styles["Line_Data_Large_Right"]),
+                                Paragraph(str("{0:.2f}".format(round(invoice_item_dict['what_sara_owes'], 2))),
+                                          styles["Line_Data_Large_Right"]),
+                                Paragraph(str("{0:.2f}".format(round(invoice_item_dict['the_owing_total'], 2))),
+                                          styles["Line_Data_Large_Right"])]]
+
+    t1 = Table(invoicing_items_summary, colWidths=(9.6 * cm, 3 * cm, 3 * cm, 3 * cm))
     t1.setStyle(TableStyle([
         ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
         ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
@@ -376,7 +471,9 @@ def generate_pdf(request, obj, invoice_item_dict, save_to_disk=False):
     story.append(t1)
 
     # TODO figure out why index out of range error
-    doc.build(story[:8], canvasmaker=NumberedCanvas)
+    len_of_story = len(story)
+    print('length of story', len_of_story)
+    doc.build(story[:len_of_story-3], canvasmaker=NumberedCanvas)
 
     pdf = buff.getvalue()
     buff.close()
