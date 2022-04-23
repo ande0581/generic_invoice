@@ -158,129 +158,127 @@ def generate_pdf(request, obj, invoice_item_dict, save_to_disk=False):
     t1 = Table(data1, colWidths=(9.3 * cm, 9.3 * cm))
     t1.setStyle(TableStyle([
         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('BACKGROUND', (0, 0), (1, 0), colors.lightgrey)
+        ('BACKGROUND', (0, 0), (1, 0), colors.darkgrey)
     ]))
 
     story.append(t1)
-
-    # Add a space between tables
-    story.append(Spacer(4, 32))
 
     # Add Title to Invoicing Party Items Section - Tom's Section
-    title = [[Paragraph(f"{obj.invoicing_party.first_name}'s Items", styles["Line_Data_Large"]),
-              Paragraph('Split %', styles["Line_Data_Large_Center"]),
-              Paragraph(f'{obj.invoicing_party.first_name }', styles["Line_Data_Large_Right"]),
-              Paragraph(f'{obj.invoiced_party.first_name} Owes', styles["Line_Data_Large_Right"]),
-              Paragraph('Total', styles["Line_Data_Large_Right"]),
-             ]]
+    if invoice_item_dict['invoicing_items_obj']:
+        # Add a space between tables
+        story.append(Spacer(4, 32))
+        
+        title = [[Paragraph(f"{obj.invoicing_party.first_name}'s Items", styles["Line_Data_Large"]),
+                  Paragraph('Split %', styles["Line_Data_Large_Center"]),
+                  Paragraph(f'{obj.invoicing_party.first_name }', styles["Line_Data_Large_Right"]),
+                  Paragraph(f'{obj.invoiced_party.first_name} Owes', styles["Line_Data_Large_Right"]),
+                  Paragraph('Total', styles["Line_Data_Large_Right"]),
+                 ]]
 
-    t1 = Table(title, colWidths=(7.6 * cm, 2 * cm, 3 * cm, 3 * cm, 3 * cm))
-    t1.setStyle(TableStyle([
-        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-        ('BOX', (0, 0), (-1, -1), .25, colors.black),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('BACKGROUND', (0, 0), (-1, -1), colors.darkgrey)
-    ]))
+        t1 = Table(title, colWidths=(7.6 * cm, 2 * cm, 3 * cm, 3 * cm, 3 * cm))
+        t1.setStyle(TableStyle([
+            ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+            ('BOX', (0, 0), (-1, -1), .25, colors.black),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('BACKGROUND', (0, 0), (-1, -1), colors.darkgrey)
+        ]))
 
-    story.append(t1)
+        story.append(t1)
 
-    # Add Invoicing Items
-    data1 = [[Paragraph(str(item.description), styles["Line_Data_Large"]),
-              Paragraph(str(item.split_percentage), styles["Line_Data_Large_Center"]),
-              Paragraph(str("{0:.2f}".format(round(item.invoicing_party_cost, 2))), styles["Line_Data_Large_Right"]),
-              Paragraph(str("{0:.2f}".format(round(item.invoiced_party_cost, 2))), styles["Line_Data_Large_Right"]),
-              Paragraph(str("{0:.2f}".format(round(item.cost, 2))), styles["Line_Data_Large_Right"])] for item
-             in
-             invoice_item_dict['invoicing_items_obj']]
+        # Add Invoicing Items
+        data1 = [[Paragraph(str(item.description), styles["Line_Data_Large"]),
+                  Paragraph(str(item.split_percentage), styles["Line_Data_Large_Center"]),
+                  Paragraph(str("{0:.2f}".format(round(item.invoicing_party_cost, 2))), styles["Line_Data_Large_Right"]),
+                  Paragraph(str("{0:.2f}".format(round(item.invoiced_party_cost, 2))), styles["Line_Data_Large_Right"]),
+                  Paragraph(str("{0:.2f}".format(round(item.cost, 2))), styles["Line_Data_Large_Right"])] for item
+                 in
+                 invoice_item_dict['invoicing_items_obj']]
 
-    t1 = Table(data1, colWidths=(7.6 * cm, 2 * cm, 3 * cm, 3 * cm, 3 * cm))
-    t1.setStyle(TableStyle([
-        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-    ]))
+        t1 = Table(data1, colWidths=(7.6 * cm, 2 * cm, 3 * cm, 3 * cm, 3 * cm))
+        t1.setStyle(TableStyle([
+            ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+            ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]))
 
-    story.append(t1)
+        story.append(t1)
 
-    # Add Total for Invoicing Items
-    invoicing_items_summary = [[Paragraph(f"Total", styles["Line_Data_Large"]),
-                                Paragraph('', styles["Line_Data_Large"]),
-                                Paragraph(str("{0:.2f}".format(round(invoice_item_dict['tom_paid_total'], 2))), styles["Line_Data_Large_Right"]),
-                                Paragraph(str("{0:.2f}".format(round(invoice_item_dict['what_sara_owes'], 2))), styles["Line_Data_Large_Right"]),
-                                Paragraph(str("{0:.2f}".format(round(invoice_item_dict['invoicing_items_total'], 2))), styles["Line_Data_Large_Right"])]]
+        # Add Total for Invoicing Items
+        invoicing_items_summary = [[Paragraph(f"Total", styles["Line_Data_Large"]),
+                                    Paragraph('', styles["Line_Data_Large"]),
+                                    Paragraph(str("{0:.2f}".format(round(invoice_item_dict['tom_paid_total'], 2))), styles["Line_Data_Large_Right"]),
+                                    Paragraph(str("{0:.2f}".format(round(invoice_item_dict['what_sara_owes'], 2))), styles["Line_Data_Large_Right"]),
+                                    Paragraph(str("{0:.2f}".format(round(invoice_item_dict['invoicing_items_total'], 2))), styles["Line_Data_Large_Right"])]]
 
-    t1 = Table(invoicing_items_summary, colWidths=(7.6 * cm, 2 * cm, 3 * cm, 3 * cm, 3 * cm))
-    t1.setStyle(TableStyle([
-        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('BACKGROUND', (0, 0), (-1, -1), colors.gainsboro)
-    ]))
+        t1 = Table(invoicing_items_summary, colWidths=(7.6 * cm, 2 * cm, 3 * cm, 3 * cm, 3 * cm))
+        t1.setStyle(TableStyle([
+            ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+            ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('BACKGROUND', (0, 0), (-1, -1), colors.gainsboro)
+        ]))
 
-    story.append(t1)
-
-    # Add a space between tables
-    story.append(Spacer(4, 32))
+        story.append(t1)
 
     # Add Title to Invoiced Party Items Section - Sara's Section
-    title = [[Paragraph(f"{obj.invoiced_party.first_name}'s Items", styles["Line_Data_Large"]),
-              Paragraph('Split %', styles["Line_Data_Large_Center"]),
-              Paragraph(f'{obj.invoiced_party.first_name }', styles["Line_Data_Large_Right"]),
-              Paragraph(f'{obj.invoicing_party.first_name} Owes', styles["Line_Data_Large_Right"]),
-              Paragraph('Total', styles["Line_Data_Large_Right"]),
-             ]]
+    if invoice_item_dict['invoiced_items_obj']:
+        # Add a space between tables
+        story.append(Spacer(4, 32))
 
-    t1 = Table(title, colWidths=(7.6 * cm, 2 * cm, 3 * cm, 3 * cm, 3 * cm))
-    t1.setStyle(TableStyle([
-        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-        ('BOX', (0, 0), (-1, -1), .25, colors.black),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('BACKGROUND', (0, 0), (-1, -1), colors.darkgrey)
-    ]))
+        title = [[Paragraph(f"{obj.invoiced_party.first_name}'s Items", styles["Line_Data_Large"]),
+                  Paragraph('Split %', styles["Line_Data_Large_Center"]),
+                  Paragraph(f'{obj.invoiced_party.first_name }', styles["Line_Data_Large_Right"]),
+                  Paragraph(f'{obj.invoicing_party.first_name} Owes', styles["Line_Data_Large_Right"]),
+                  Paragraph('Total', styles["Line_Data_Large_Right"]),
+                 ]]
 
-    story.append(t1)
+        t1 = Table(title, colWidths=(7.6 * cm, 2 * cm, 3 * cm, 3 * cm, 3 * cm))
+        t1.setStyle(TableStyle([
+            ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+            ('BOX', (0, 0), (-1, -1), .25, colors.black),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('BACKGROUND', (0, 0), (-1, -1), colors.darkgrey)
+        ]))
 
-    # Add Invoiced Items
-    data1 = [[Paragraph(str(item.description), styles["Line_Data_Large"]),
-              Paragraph(str(item.split_percentage), styles["Line_Data_Large_Center"]),
-              Paragraph(str("{0:.2f}".format(round(item.invoiced_party_cost, 2))), styles["Line_Data_Large_Right"]),
-              Paragraph(str("{0:.2f}".format(round(item.invoicing_party_cost, 2))), styles["Line_Data_Large_Right"]),
-              Paragraph(str("{0:.2f}".format(round(item.cost, 2))), styles["Line_Data_Large_Right"])] for item
-             in
-             invoice_item_dict['invoiced_items_obj']]
+        story.append(t1)
 
-    t1 = Table(data1, colWidths=(7.6 * cm, 2 * cm, 3 * cm, 3 * cm, 3 * cm))
-    t1.setStyle(TableStyle([
-        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-    ]))
+        # Add Invoiced Items
+        data1 = [[Paragraph(str(item.description), styles["Line_Data_Large"]),
+                  Paragraph(str(item.split_percentage), styles["Line_Data_Large_Center"]),
+                  Paragraph(str("{0:.2f}".format(round(item.invoiced_party_cost, 2))), styles["Line_Data_Large_Right"]),
+                  Paragraph(str("{0:.2f}".format(round(item.invoicing_party_cost, 2))), styles["Line_Data_Large_Right"]),
+                  Paragraph(str("{0:.2f}".format(round(item.cost, 2))), styles["Line_Data_Large_Right"])] for item
+                 in
+                 invoice_item_dict['invoiced_items_obj']]
 
-    story.append(t1)
+        t1 = Table(data1, colWidths=(7.6 * cm, 2 * cm, 3 * cm, 3 * cm, 3 * cm))
+        t1.setStyle(TableStyle([
+            ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+            ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]))
 
-    # Add Total for Invoiced Items
-    invoicing_items_summary = [[Paragraph(f"Total", styles["Line_Data_Large"]),
-                                Paragraph('', styles["Line_Data_Large"]),
-                                Paragraph(str("{0:.2f}".format(round(invoice_item_dict['sara_paid_total'], 2))), styles["Line_Data_Large_Right"]),
-                                Paragraph(str("{0:.2f}".format(round(invoice_item_dict['what_tom_owes'], 2))), styles["Line_Data_Large_Right"]),
-                                Paragraph(str("{0:.2f}".format(round(invoice_item_dict['invoiced_items_total'], 2))), styles["Line_Data_Large_Right"])]]
+        story.append(t1)
 
-    t1 = Table(invoicing_items_summary, colWidths=(7.6 * cm, 2 * cm, 3 * cm, 3 * cm, 3 * cm))
-    t1.setStyle(TableStyle([
-        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('BACKGROUND', (0, 0), (-1, -1), colors.gainsboro)
-    ]))
+        # Add Total for Invoiced Items
+        invoicing_items_summary = [[Paragraph(f"Total", styles["Line_Data_Large"]),
+                                    Paragraph('', styles["Line_Data_Large"]),
+                                    Paragraph(str("{0:.2f}".format(round(invoice_item_dict['sara_paid_total'], 2))), styles["Line_Data_Large_Right"]),
+                                    Paragraph(str("{0:.2f}".format(round(invoice_item_dict['what_tom_owes'], 2))), styles["Line_Data_Large_Right"]),
+                                    Paragraph(str("{0:.2f}".format(round(invoice_item_dict['invoiced_items_total'], 2))), styles["Line_Data_Large_Right"])]]
 
-    story.append(t1)
+        t1 = Table(invoicing_items_summary, colWidths=(7.6 * cm, 2 * cm, 3 * cm, 3 * cm, 3 * cm))
+        t1.setStyle(TableStyle([
+            ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+            ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('BACKGROUND', (0, 0), (-1, -1), colors.gainsboro)
+        ]))
+
+        story.append(t1)
 
     # Add a space between tables
     story.append(Spacer(4, 32))
-
-
-
-
 
     # Add Summary of Who Owes to Invoice
     title = [[Paragraph(f"Summary", styles["Line_Data_Large"]),
@@ -317,163 +315,10 @@ def generate_pdf(request, obj, invoice_item_dict, save_to_disk=False):
 
     story.append(t1)
 
-        # # Calculate total per job and add to PDF
-        # total = items.aggregate(Sum('total'))['total__sum']
-        # total_text = "{} Total".format(job_name)
-        # data1 = [[Paragraph(total_text, styles["Line_Data_Large"]),
-        #           Paragraph(str("${0:.2f}".format(total)), styles['Line_Data_Large_Right'])]
-        #          ]
-        #
-        # t1 = Table(data1, colWidths=(15 * cm, 3.6 * cm))
-        # t1.setStyle(TableStyle([
-        #     ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-        #     ('BOX', (0, 0), (-1, -1), .25, colors.black),
-        #     ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        #     ('BACKGROUND', (0, 0), (-1, -1), colors.lightgrey)
-        # ]))
-        #
-        # story.append(t1)
-        # story.append(Spacer(4, 32))
-    #
-    # # Calculate Bid Total
-    # items = BidItem.objects.all().filter(bid=obj.id)
-    # bid_total = items.aggregate(Sum('total'))['total__sum']
-    #
-    # if not bid_total:
-    #     bid_total = 0
-    #
-    # if invoice:  # Calculate Balance Due and Payment History for Invoice
-    #     payments = Payment.objects.all().filter(bid=obj.id)
-    #     payment_total = payments.aggregate(Sum('amount'))['amount__sum']
-    #
-    #     cents = Decimal('0.01')
-    #     if payment_total:
-    #         remaining_balance = Decimal(bid_total - payment_total).quantize(cents, ROUND_HALF_UP)
-    #     else:
-    #         remaining_balance = bid_total
-    #
-    #     data1 = [
-    #         [Paragraph('Invoice Summary', styles["Line_Data_Large"]),
-    #          None],
-    #         [Paragraph('Initial Balance', styles["Line_Data_Large"]),
-    #          Paragraph(str("{0:.2f}".format(round(bid_total, 2))), styles["Line_Data_Large_Right"])],
-    #     ]
-    #
-    #     data2 = [[Paragraph(str("Received Payment on {}".format(payment.date.strftime('%x'))),
-    #                         styles["Line_Data_Large"]),
-    #               Paragraph(str("-{0:.2f}".format(round(payment.amount, 2))), styles["Line_Data_Large_Right"])] for
-    #              payment in payments]
-    #
-    #     last_row = len(data2) + 2
-    #
-    #     data3 = [[Paragraph('Remaining Balance Due', styles["Line_Data_Large"]),
-    #              Paragraph(str("${0:.2f}".format(round(remaining_balance, 2))),
-    #                        styles["Line_Data_Large_Right"])]]
-    #
-    #     all_data = data1 + data2 + data3
-    #
-    #     t1 = Table(all_data, colWidths=(14 * cm, 4.6 * cm))
-    #     t1.setStyle(TableStyle([
-    #         ('BOX', (0, 0), (-1, -1), .25, colors.black),
-    #         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-    #         ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),  # we propose
-    #         ('BACKGROUND', (0, last_row), (-1, last_row), colors.lightgrey),  # payment outline
-    #     ]))
-    #
-    #     story.append(KeepTogether(t1))
-    #
-    # elif employee:  # If employee skip rest of bid info
-    #     pass
-    #
-    # else:  # Proposal
-    #
-    #     if obj.custom_down_payment and obj.custom_down_payment != -1:
-    #         down_payment = obj.custom_down_payment
-    #     elif obj.custom_down_payment == -1:
-    #         down_payment = 0
-    #     else:
-    #         if bid_total:
-    #             down_payment = bid_total / 2
-    #         else:
-    #             down_payment = 0
-    #
-    #     if bid_total:
-    #         cents = Decimal('0.01')
-    #         final_payment = Decimal(bid_total - down_payment).quantize(cents, ROUND_HALF_UP)
-    #     else:
-    #         final_payment = 0
-    #
-    #     if not bid_total:
-    #         bid_total = 0
-
-        # we_propose = 'Hereby to furnish material and labor complete in accordance with above specifications,' \
-        #              ' for the sum of'
-        #
-        # acceptance = """The above prices, specifications and conditions are satisfactory and are hereby accepted.
-        # You are authorized to do the work as specified. Payment will be made as outlined above.
-        # I have received a copy of the Pre-Lien notice."""
-
-        # data1 = [
-        #     [Paragraph('We Propose', styles["Line_Data_Large"]),
-        #      None],
-        #     [Paragraph(we_propose, styles["Line_Data_Large"]),
-        #      Paragraph(str("${0:.2f}".format(round(bid_total, 2))), styles["Line_Data_Large_Right"])],
-        #     [Paragraph('Payment Outline', styles["Line_Data_Large"]),
-        #      None],
-        #     [Paragraph('Deposit', styles["Line_Data_Large"]),
-        #      Paragraph(str("${0:.2f}".format(round(down_payment, 2))), styles["Line_Data_Large_Right"])],
-        #     [Paragraph('Remaining Balance Due Upon Completion of the Contract', styles["Line_Data_Large"]),
-        #      Paragraph(str("${0:.2f}".format(round(final_payment, 2))), styles["Line_Data_Large_Right"])],
-        #     [Paragraph('Acceptance of Proposal', styles["Line_Data_Large"]),
-        #      None],
-        #     [Paragraph(acceptance, styles["Line_Data_Large"]),
-        #      None],
-        #     [Paragraph('Signature:', styles["Line_Label"]),
-        #      Paragraph('Date:', styles["Line_Label"])],
-        #     [Paragraph('X__________________________________________________________________', styles["Line_Label"]),
-        #      Paragraph('_____________________', styles["Line_Label"])],
-        # ]
-
-    #t1 = Table(data1, colWidths=(14 * cm, 4.6 * cm))
-    t1 = Table(data1, colWidths=(14 * cm))
-    t1.setStyle(TableStyle([
-        ('BOX', (0, 0), (-1, -1), .25, colors.black),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),  # we propose
-        ('BACKGROUND', (0, 2), (-1, 2), colors.lightgrey),  # payment outline
-        ('BACKGROUND', (0, 5), (-1, 5), colors.lightgrey),  # acceptance of proposal
-        ('SPAN', (0, 6), (-1, 6)),  # span acceptance text across both columns
-        ('BOTTOMPADDING', (0, 7), (-1, 7), 40)
-    ]))
-
-    story.append(KeepTogether(t1))
-
-    # Add Pre-Lien Notice to PDF
-    story.append(PageBreak())
-
-    pre_lien_notice = """
-    <br />
-    ANY PERSON OR COMPANY SUPPLYING LABOR OR MATERIALS FOR THIS IMPROVEMENT TO YOUR PROPERTY MAY FILE A LIEN
-    AGAINST YOUR PROPERTY IF THAT PERSON OR COMPANY IS NOT PAID FOR THE CONTRIBUTIONS.<br /><br />
-
-    UNDER MINNESOTA LAW, YOU HAVE THE RIGHT TO PAY PERSONS WHO SUPPLIED LABOR OR MATERIALS FOR THIS IMPROVEMENT
-     DIRECTLY AND DEDUCT THIS AMOUNT FROM OUR CONTRACT PRICE, OR WITHHOLD THE AMOUNTS DUE THEM FROM US UNTIL
-     120 DAYS AFTER COMPLETION OF THE IMPROVEMENT UNLESS WE GIVE YOU A LIEN WAIVER SIGNED BY PERSONS WHO SUPPLIED
-     ANY LABOR OR MATERIAL FOR THE IMPROVEMENT AND WHO GAVE YOU TIMELY NOTICE.
-    """
-
-    data1 = [
-        [Paragraph('PRE-LIEN NOTICE', styles["Line_Data_Large_Center"])],
-        [Paragraph(pre_lien_notice, styles["Line_Data_Large"])]
-        ]
-
-    t1 = Table(data1)
-    story.append(t1)
-
     # TODO figure out why index out of range error
     len_of_story = len(story)
     print('length of story', len_of_story)
-    doc.build(story[:len_of_story-3], canvasmaker=NumberedCanvas)
+    doc.build(story[:len_of_story], canvasmaker=NumberedCanvas)
 
     pdf = buff.getvalue()
     buff.close()
