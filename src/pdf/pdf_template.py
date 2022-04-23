@@ -177,71 +177,68 @@ def generate_pdf(request, obj, invoice_item_dict, save_to_disk=False):
     #
     # story.append(t1)
 
-    # Add Bid Items to PDF
-    # story.append(Spacer(4, 32))
+    # Add Invoice Items to PDF
+    story.append(Spacer(4, 32))
 
-    # for job_name, items in bid_item_dict.items():
-    #     title = [[Paragraph(job_name, styles["Line_Data_Large"]),
-    #               Paragraph('', styles["Line_Data_Large"])]
-    #              ]
+    # print('airplane', invoice_item_dict['invoicing_items_obj'])
+    # print(type(invoice_item_dict['invoicing_items_obj']))
     #
-    #     t1 = Table(title, colWidths=(15 * cm, 3.6 * cm))
-    #     t1.setStyle(TableStyle([
-    #         ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-    #         ('BOX', (0, 0), (-1, -1), .25, colors.black),
-    #         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-    #         ('BACKGROUND', (0, 0), (-1, -1), colors.lightgrey)
-    #     ]))
-    #
-    #     story.append(t1)
-    #
-    #     if employee:  # Add quantities but remove pricing
-    #         data1 = [[Paragraph(str(item.description), styles["Line_Data_Large"]),
-    #                   Paragraph(str(item.quantity), styles["Line_Data_Large_Right"])] for item in
-    #                  items]
-    #
-    #         t1 = Table(data1, colWidths=(15 * cm, 3.6 * cm))
-    #         t1.setStyle(TableStyle([
-    #             ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-    #             ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
-    #             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-    #         ]))
-    #
-    #         story.append(t1)
-    #         story.append(Spacer(4, 32))
-    #
-    #     else:  # Add pricing but not quantity for end customer
-    #         data1 = [[Paragraph(str(item.description), styles["Line_Data_Large"]),
-    #                   Paragraph(str("{0:.2f}".format(round(item.total, 2))), styles["Line_Data_Large_Right"])] for item
-    #                  in
-    #                  items]
-    #
-    #         t1 = Table(data1, colWidths=(15 * cm, 3.6 * cm))
-    #         t1.setStyle(TableStyle([
-    #             ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-    #             ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
-    #             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-    #         ]))
-    #
-    #         story.append(t1)
-    #
-    #         # Calculate total per job and add to PDF
-    #         total = items.aggregate(Sum('total'))['total__sum']
-    #         total_text = "{} Total".format(job_name)
-    #         data1 = [[Paragraph(total_text, styles["Line_Data_Large"]),
-    #                   Paragraph(str("${0:.2f}".format(total)), styles['Line_Data_Large_Right'])]
-    #                  ]
-    #
-    #         t1 = Table(data1, colWidths=(15 * cm, 3.6 * cm))
-    #         t1.setStyle(TableStyle([
-    #             ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-    #             ('BOX', (0, 0), (-1, -1), .25, colors.black),
-    #             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-    #             ('BACKGROUND', (0, 0), (-1, -1), colors.lightgrey)
-    #         ]))
-    #
-    #         story.append(t1)
-    #         story.append(Spacer(4, 32))
+    # for item in invoice_item_dict['invoicing_items_obj']:
+    #     print('jet', item)
+
+    # Add Title to Items Section
+    title = [[Paragraph(f"{obj.invoicing_party.first_name}'s Items", styles["Line_Data_Large"]),
+              Paragraph('Split %', styles["Line_Data_Large"]),
+              Paragraph(f'{obj.invoicing_party.first_name }', styles["Line_Data_Large"]),
+              Paragraph(f'{obj.invoiced_party.first_name} Owes', styles["Line_Data_Large"]),
+              Paragraph('Total', styles["Line_Data_Large"]),
+             ]]
+
+    t1 = Table(title, colWidths=(7.6 * cm, 2 * cm, 3 * cm, 3 * cm, 3 * cm))
+    t1.setStyle(TableStyle([
+        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+        ('BOX', (0, 0), (-1, -1), .25, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BACKGROUND', (0, 0), (-1, -1), colors.lightgrey)
+    ]))
+
+    story.append(t1)
+
+    # Add Invoicing Items
+    data1 = [[Paragraph(str(item.description), styles["Line_Data_Large"]),
+              Paragraph(str(item.split_percentage), styles["Line_Data_Large_Right"]),
+              Paragraph(str(item.invoicing_party_cost), styles["Line_Data_Large_Right"]),
+              Paragraph(str(item.invoiced_party_cost), styles["Line_Data_Large_Right"]),
+              Paragraph(str("{0:.2f}".format(round(item.cost, 2))), styles["Line_Data_Large_Right"])] for item
+             in
+             invoice_item_dict['invoicing_items_obj']]
+
+    t1 = Table(data1, colWidths=(7.6 * cm, 2 * cm, 3 * cm, 3 * cm, 3 * cm))
+    t1.setStyle(TableStyle([
+        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ]))
+
+    story.append(t1)
+
+        # # Calculate total per job and add to PDF
+        # total = items.aggregate(Sum('total'))['total__sum']
+        # total_text = "{} Total".format(job_name)
+        # data1 = [[Paragraph(total_text, styles["Line_Data_Large"]),
+        #           Paragraph(str("${0:.2f}".format(total)), styles['Line_Data_Large_Right'])]
+        #          ]
+        #
+        # t1 = Table(data1, colWidths=(15 * cm, 3.6 * cm))
+        # t1.setStyle(TableStyle([
+        #     ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+        #     ('BOX', (0, 0), (-1, -1), .25, colors.black),
+        #     ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        #     ('BACKGROUND', (0, 0), (-1, -1), colors.lightgrey)
+        # ]))
+        #
+        # story.append(t1)
+        # story.append(Spacer(4, 32))
     #
     # # Calculate Bid Total
     # items = BidItem.objects.all().filter(bid=obj.id)
@@ -379,7 +376,7 @@ def generate_pdf(request, obj, invoice_item_dict, save_to_disk=False):
     story.append(t1)
 
     # TODO figure out why index out of range error
-    doc.build(story[:5], canvasmaker=NumberedCanvas)
+    doc.build(story[:8], canvasmaker=NumberedCanvas)
 
     pdf = buff.getvalue()
     buff.close()

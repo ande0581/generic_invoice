@@ -76,16 +76,16 @@ class InvoiceDetail(LoginRequiredMixin, DetailView):
         # total cost of saras items
         invoiced_items_total = invoiced_items_obj.aggregate(Sum('cost'))['cost__sum']
 
-        # total amount tom paid
+        # total amount that tom paid
         tom_paid_total = invoicing_items_obj.aggregate(Sum('invoicing_party_cost'))['invoicing_party_cost__sum']
 
-        # total amount sara paid
+        # total amount that sara paid
         sara_paid_total = invoiced_items_obj.aggregate(Sum('invoiced_party_cost'))['invoiced_party_cost__sum']
 
-        # what tom owes
+        # total amount tom owes
         what_tom_owes = invoiced_items_obj.aggregate(Sum('invoicing_party_cost'))['invoicing_party_cost__sum']
 
-        # what sara owes
+        # total amount sara owes
         what_sara_owes = invoicing_items_obj.aggregate(Sum('invoiced_party_cost'))['invoiced_party_cost__sum']
 
         context['invoicing_items_total'] = invoicing_items_total
