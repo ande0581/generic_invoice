@@ -17,7 +17,7 @@
       {% for document in object_list %}
         <tr style="{% cycle 'background: white' 'background: #F0F0F0' %}">
             <td>{{ document.uploaded_date }}</td>
-            <td><a href="{{ MEDIA_URL }}{{ document.filename }}" target="_blank">{{ document.shorten_filename }}</a></td>
+            <td><a href="{% get_media_prefix %}{{ document.filename }}" target="_blank">{{ document.shorten_filename }}</a></td>
             <td>{{ document.description }}</td>
             <td><a href="{% url 'invoice_attachment_app:invoice_attachment_delete' pk=document.pk %}">Delete</a></td>
         </tr>

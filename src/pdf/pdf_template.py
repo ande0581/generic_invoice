@@ -1,28 +1,16 @@
 import datetime
-from decimal import Decimal, ROUND_HALF_UP
-from django.conf import settings
 from django.contrib import messages
 from django.core.files.base import ContentFile
-from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.six import BytesIO
-import os
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
-# from reportlab.lib.pagesizes import cm
 from reportlab.lib.units import mm, inch, cm
-# from reportlab.pdfgen import canvaspy
 from reportlab.pdfgen import canvas
-from reportlab.platypus import KeepTogether
-from reportlab.platypus import PageBreak
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
-
-
 from .models import PDFImage
-# from bid_item.models import BidItem
-# from payment.models import Payment
 
 
 class NumberedCanvas(canvas.Canvas):
@@ -158,7 +146,7 @@ def generate_pdf(request, obj, invoice_item_dict, save_to_disk=False):
     t1 = Table(data1, colWidths=(9.3 * cm, 9.3 * cm))
     t1.setStyle(TableStyle([
         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('BACKGROUND', (0, 0), (1, 0), colors.darkgrey)
+        ('BACKGROUND', (0, 0), (1, 0), colors.gainsboro)
     ]))
 
     story.append(t1)
@@ -167,7 +155,7 @@ def generate_pdf(request, obj, invoice_item_dict, save_to_disk=False):
     if invoice_item_dict['invoicing_items_obj']:
         # Add a space between tables
         story.append(Spacer(4, 32))
-        
+
         title = [[Paragraph(f"{obj.invoicing_party.first_name}'s Items", styles["Line_Data_Large"]),
                   Paragraph('Split %', styles["Line_Data_Large_Center"]),
                   Paragraph(f'{obj.invoicing_party.first_name }', styles["Line_Data_Large_Right"]),
@@ -180,7 +168,7 @@ def generate_pdf(request, obj, invoice_item_dict, save_to_disk=False):
             ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
             ('BOX', (0, 0), (-1, -1), .25, colors.black),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('BACKGROUND', (0, 0), (-1, -1), colors.darkgrey)
+            ('BACKGROUND', (0, 0), (-1, -1), colors.gainsboro)
         ]))
 
         story.append(t1)
@@ -215,7 +203,7 @@ def generate_pdf(request, obj, invoice_item_dict, save_to_disk=False):
             ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
             ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('BACKGROUND', (0, 0), (-1, -1), colors.gainsboro)
+            ('BACKGROUND', (0, 0), (-1, -1), colors.whitesmoke)
         ]))
 
         story.append(t1)
@@ -237,7 +225,7 @@ def generate_pdf(request, obj, invoice_item_dict, save_to_disk=False):
             ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
             ('BOX', (0, 0), (-1, -1), .25, colors.black),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('BACKGROUND', (0, 0), (-1, -1), colors.darkgrey)
+            ('BACKGROUND', (0, 0), (-1, -1), colors.gainsboro)
         ]))
 
         story.append(t1)
@@ -272,7 +260,7 @@ def generate_pdf(request, obj, invoice_item_dict, save_to_disk=False):
             ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
             ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('BACKGROUND', (0, 0), (-1, -1), colors.gainsboro)
+            ('BACKGROUND', (0, 0), (-1, -1), colors.whitesmoke)
         ]))
 
         story.append(t1)
@@ -292,7 +280,7 @@ def generate_pdf(request, obj, invoice_item_dict, save_to_disk=False):
         ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
         ('BOX', (0, 0), (-1, -1), .25, colors.black),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('BACKGROUND', (0, 0), (-1, -1), colors.darkgrey)
+        ('BACKGROUND', (0, 0), (-1, -1), colors.gainsboro)
     ]))
 
     story.append(t1)
@@ -311,14 +299,12 @@ def generate_pdf(request, obj, invoice_item_dict, save_to_disk=False):
         ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
         ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('BACKGROUND', (0, 0), (-1, -1), colors.whitesmoke)
     ]))
 
     story.append(t1)
 
-    # TODO figure out why index out of range error
-    len_of_story = len(story)
-    print('length of story', len_of_story)
-    doc.build(story[:len_of_story], canvasmaker=NumberedCanvas)
+    doc.build(story, canvasmaker=NumberedCanvas)
 
     pdf = buff.getvalue()
     buff.close()

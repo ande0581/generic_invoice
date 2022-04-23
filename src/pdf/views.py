@@ -14,8 +14,6 @@ Customer = apps.get_model('customer', 'Customer')
 Invoice = apps.get_model('invoice', 'Invoice')
 InvoiceItem = apps.get_model('invoice_item', 'InvoiceItem')
 
-# TODO clean-up pdf.views
-
 
 def create_invoice_item_dict(invoice_obj):
     invoicing_items_obj = InvoiceItem.objects.filter(is_invoicing_party=True, invoice=invoice_obj)
@@ -46,11 +44,13 @@ def create_invoice_item_dict(invoice_obj):
         what_sara_owes = 0
 
     if what_tom_owes > what_sara_owes:
-        the_owing_party = f"{invoice_obj.invoicing_party.first_name} Owes"
         the_owing_total = what_tom_owes - what_sara_owes
+        formatted_total = "{:.2f}".format(the_owing_total)
+        the_owing_party = f"{invoice_obj.invoicing_party.first_name} Owes ${formatted_total}"
     elif what_sara_owes > what_tom_owes:
-        the_owing_party = f"{invoice_obj.invoiced_party.first_name} Owes"
         the_owing_total = what_sara_owes - what_tom_owes
+        formatted_total = "{:.2f}".format(the_owing_total)
+        the_owing_party = f"{invoice_obj.invoiced_party.first_name} Owes ${formatted_total}"
     elif what_tom_owes == what_sara_owes:
         the_owing_party = "Nobody Owes"
         the_owing_total = 0
@@ -74,11 +74,9 @@ def create_invoice_item_dict(invoice_obj):
 
 
 @login_required()
-def view_pdf(request, return_file_object=False, **kwargs):
+def view_pdf(request, **kwargs):
     obj = Invoice.objects.get(pk=kwargs['invoice_id'])
     invoice_item_dict = create_invoice_item_dict(invoice_obj=obj)
-    # response = generate_pdf(request, obj=obj, bid_item_dict=bid_item_dict, invoice=invoice, employee=employee,
-    #                         save_to_disk=False, return_file_object=return_file_object)
     response = generate_pdf(request, obj=obj, invoice_item_dict=invoice_item_dict, save_to_disk=False)
     return response
 
@@ -87,8 +85,6 @@ def view_pdf(request, return_file_object=False, **kwargs):
 def save_pdf(request, **kwargs):
     obj = Invoice.objects.get(pk=kwargs['invoice_id'])
     invoice_item_dict = create_invoice_item_dict(invoice_obj=obj)
-    # response = generate_pdf(request, obj=obj, bid_item_dict=bid_item_dict, invoice=invoice, employee=employee,
-    #                         save_to_disk=True)
     response = generate_pdf(request, obj=obj, invoice_item_dict=invoice_item_dict, save_to_disk=True)
     return response
 

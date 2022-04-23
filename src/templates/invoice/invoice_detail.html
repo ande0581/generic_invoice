@@ -2,6 +2,8 @@
 
 {% block content %}
 
+{% load static %}
+
 <strong>{{ invoiced_party.first_name }} {{ invoiced_party.last_name }} - {{ object.description|upper }}</strong><br>
 Invoice Number {{ object.id }}<br>
 Created: {{ object.created_date }}<br><br>
@@ -136,7 +138,7 @@ role="button">Preview Invoice</a>
       </thead>
       {% for pdf in saved_invoices %}
       <tr style="{% cycle 'background: white' 'background: #F0F0F0' %}">
-          <td><a href="../media/{{ pdf.filename }}" target="_blank">{{ pdf.shorten_filename }}</a></td>
+          <td><a href="{% get_media_prefix %}{{ pdf.filename }}" target="_blank">{{ pdf.shorten_filename }}</a></td>
           <td style="text-align:center"><a href="{% url 'pdf_app:pdf_delete' pk=pdf.id %}">Delete</a></td>
           <td style="text-align:center"><a href="{% url 'send_email_app:email_create' pdf_id=pdf.id %}">Email</a>
           </td>
@@ -162,7 +164,7 @@ role="button">Preview Invoice</a>
       </thead>
       {% for attachment in attachments %}
       <tr style="{% cycle 'background: white' 'background: #F0F0F0' %}">
-          <td><a href="../media/{{ attachment.filename }}" target="_blank">{{ attachment.description }}</a></td>
+          <td><a href="{% get_media_prefix %}{{ attachment.filename }}" target="_blank">{{ attachment.description }}</a></td>
           <td style="text-align:center"><a href="{% url 'invoice_attachment_app:invoice_attachment_delete' pk=attachment.id %}">Delete</a></td>
       </tr>
       {% endfor %}
