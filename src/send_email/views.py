@@ -50,7 +50,8 @@ def send_email(pdf_id, to_address, subject, body, attachments):
     # Attempt to send email
     try:
         response = email.send()
-    except Exception:
+    except Exception as email_error:
+        print(f"Email Error: {email_error}")
         response = 0
 
     # invoice attachment filename
